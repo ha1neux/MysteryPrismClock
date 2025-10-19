@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		44A6FDC62EA4930F006854BE /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 44A6FDC22EA4930F006854BE /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		44483AC12EA452BD00F49641 = {
 			isa = PBXGroup;
 			children = (
+				44A6FDC22EA4930F006854BE /* .gitignore */,
 				44483ACD2EA452BD00F49641 /* MysteryPrismClock */,
 				44483ACC2EA452BD00F49641 /* Products */,
 			);
@@ -120,6 +126,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44A6FDC62EA4930F006854BE /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,7 +278,7 @@
 				PRODUCT_NAME = MysteryPrism;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "MysteryPrismClock-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = saver;
@@ -296,7 +303,7 @@
 				PRODUCT_NAME = MysteryPrism;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "MysteryPrismClock-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = saver;
 			};
