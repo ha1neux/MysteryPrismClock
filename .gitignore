@@ -94,6 +94,10 @@ iOSInjectionProject/
 .AppleDouble
 .LSOverride
 
+# Screen Saver specific
+*.saver
+*.bundle
+
 # Icon must end with two \r
 Icon
 
