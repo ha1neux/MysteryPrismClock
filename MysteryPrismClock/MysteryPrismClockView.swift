@@ -24,8 +24,19 @@ struct MysteryPrismClockView: View {
     
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
+    private let minClockSize: CGFloat = 200.0
+    private let maxClockSize: CGFloat = 600.0
     private let inset: CGFloat = 0.8
-    private let insetPrime: CGFloat = (1.0 - 0.8) / 2
+    private var insetPrime: CGFloat { (1.0 - inset) / 2 }
+    
+    private func calculateClockSize(for geometry: CGSize) -> CGFloat {
+        // Use the smaller dimension to ensure the clock fits
+        let baseDimension = min(geometry.width, geometry.height)
+        let calculatedSize = baseDimension / clockSizeFactor
+        
+        // Clamp the size to reasonable bounds
+        return max(minClockSize, min(maxClockSize, calculatedSize))
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -38,16 +49,19 @@ struct MysteryPrismClockView: View {
                 ClockView(
                     time: currentTime,
                     clockBaseColor: clockBaseColor,
-                    clockSize: geometry.size.height / clockSizeFactor,
+                    clockSize: calculateClockSize(for: geometry.size),
                     inset: inset,
                     insetPrime: insetPrime
                 )
                 .position(clockPosition == .zero ? CGPoint(x: geometry.size.width/2, y: geometry.size.height/2) : clockPosition)
             }
             .onAppear {
-                screenSize = geometry.size
-                setupInitialClock()
-                startTimers()
+                // Add a small delay to ensure geometry is properly initialized
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    screenSize = geometry.size
+                    setupInitialClock()
+                    startTimers()
+                }
             }
             .onDisappear {
                 stopTimers()
@@ -91,13 +105,17 @@ struct MysteryPrismClockView: View {
         guard screenSize != .zero else { return }
         
         // Calculate clock size and ensure it stays on screen
-        let clockSize = screenSize.height / clockSizeFactor
+        let clockSize = calculateClockSize(for: screenSize)
         let margin = clockSize / 2
+        
+        // Ensure we have valid bounds for positioning
+        let maxX = max(margin, screenSize.width - margin)
+        let maxY = max(margin, screenSize.height - margin)
         
         // Move clock to a new random position, keeping it fully visible
         clockPosition = CGPoint(
-            x: CGFloat.random(in: margin...(screenSize.width - margin)),
-            y: CGFloat.random(in: margin...(screenSize.height - margin))
+            x: margin == maxX ? margin : CGFloat.random(in: margin...maxX),
+            y: margin == maxY ? margin : CGFloat.random(in: margin...maxY)
         )
         clockBaseColor = Color.random
     }
