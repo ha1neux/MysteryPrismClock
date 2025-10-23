@@ -14,7 +14,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 4. Install the generated `.saver` file by double-clicking it
 5. Select "MysteryPrismClock" in System Preferences > Desktop & Screen Saver
 
-   Note: If you make changes to the code and recompile and reinstall, you must reboot to have
+   Note: If you make changes to the code and recompile and reinstall, you might have to reboot to have
    the changes take effect. This is a limitation of macOS.
 
 ## Technical Details
