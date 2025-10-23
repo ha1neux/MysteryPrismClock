@@ -6,10 +6,6 @@
 	objectVersion = 70;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		44A6FDC62EA4930F006854BE /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 44A6FDC22EA4930F006854BE /* .gitignore */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -122,7 +118,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44A6FDC62EA4930F006854BE /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

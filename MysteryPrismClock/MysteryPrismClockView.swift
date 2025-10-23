@@ -35,7 +35,8 @@ struct MysteryPrismClockView: View {
         let calculatedSize = baseDimension / clockSizeFactor
         
         // Clamp the size to reasonable bounds
-        return max(minClockSize, min(maxClockSize, calculatedSize))
+//        return max(minClockSize, min(maxClockSize, calculatedSize))
+        return calculatedSize
     }
     
     var body: some View {
