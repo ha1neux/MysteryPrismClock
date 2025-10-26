@@ -20,7 +20,12 @@ struct MysteryPrismClockView: View {
     @State private var screenSize = CGSize.zero
     
     @State private var timer: Timer?
-    @State private var repositionTimer: Timer?
+    @State private var movementTimer: Timer?
+    
+    // Movement properties for smooth sliding
+    @State private var velocity = CGPoint(x: 1.0, y: 0.5)
+    @State private var targetPosition = CGPoint.zero
+    @State private var isMoving = false
     
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
@@ -28,6 +33,11 @@ struct MysteryPrismClockView: View {
     private let maxClockSize: CGFloat = 600.0
     private let inset: CGFloat = 0.8
     private var insetPrime: CGFloat { (1.0 - inset) / 2 }
+    
+    // Movement constants
+    private let baseSpeed: CGFloat = 0.16 // Base movement speed (pixels per frame) - 1/5th of original
+    private let directionChangeInterval: TimeInterval = 15.0 // Change direction every 15 seconds
+    private let colorChangeInterval: TimeInterval = 30.0 // Change color every 30 seconds
     
     private func calculateClockSize(for geometry: CGSize) -> CGFloat {
         // Use the smaller dimension to ensure the clock fits
@@ -55,6 +65,7 @@ struct MysteryPrismClockView: View {
                     insetPrime: insetPrime
                 )
                 .position(clockPosition == .zero ? CGPoint(x: geometry.size.width/2, y: geometry.size.height/2) : clockPosition)
+                .animation(.linear(duration: 1/60.0), value: clockPosition) // Smooth animation for position changes
             }
             .onAppear {
                 // Add a small delay to ensure geometry is properly initialized
@@ -70,27 +81,64 @@ struct MysteryPrismClockView: View {
             .onChange(of: geometry.size) { oldSize, newSize in
                 screenSize = newSize
                 if clockPosition == .zero {
-                    repositionClock()
+                    setupInitialPosition()
                 }
+                updateBoundaries()
             }
         }
     }
     
     private func setupInitialClock() {
         clockBaseColor = Color.random
-        repositionClock()
+        setupInitialPosition()
+        setupInitialVelocity()
+    }
+    
+    private func setupInitialPosition() {
+        guard screenSize != .zero else { return }
+        
+        // Start at center of screen
+        clockPosition = CGPoint(
+            x: screenSize.width / 2,
+            y: screenSize.height / 2
+        )
+    }
+    
+    private func setupInitialVelocity() {
+        // Random initial direction
+        let angle = Double.random(in: 0...(2 * .pi))
+        velocity = CGPoint(
+            x: cos(angle) * baseSpeed,
+            y: sin(angle) * baseSpeed
+        )
     }
     
     private func startTimers() {
+        // Timer for updating the clock time (30 FPS)
         timer = Timer.scheduledTimer(withTimeInterval: 1/30.0, repeats: true) { _ in
             Task { @MainActor in
                 currentTime = Date()
             }
         }
         
-        repositionTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+        // Timer for smooth movement (60 FPS)
+        movementTimer = Timer.scheduledTimer(withTimeInterval: 1/60.0, repeats: true) { _ in
             Task { @MainActor in
-                repositionClock()
+                updateClockPosition()
+            }
+        }
+        
+        // Timer for periodic direction changes
+        Timer.scheduledTimer(withTimeInterval: directionChangeInterval, repeats: true) { _ in
+            Task { @MainActor in
+                changeDirection()
+            }
+        }
+        
+        // Timer for periodic color changes
+        Timer.scheduledTimer(withTimeInterval: colorChangeInterval, repeats: true) { _ in
+            Task { @MainActor in
+                changeColor()
             }
         }
     }
@@ -98,27 +146,84 @@ struct MysteryPrismClockView: View {
     private func stopTimers() {
         timer?.invalidate()
         timer = nil
-        repositionTimer?.invalidate()
-        repositionTimer = nil
+        movementTimer?.invalidate()
+        movementTimer = nil
     }
     
-    private func repositionClock() {
+    private func updateClockPosition() {
         guard screenSize != .zero else { return }
         
-        // Calculate clock size and ensure it stays on screen
         let clockSize = calculateClockSize(for: screenSize)
         let margin = clockSize / 2
         
-        // Ensure we have valid bounds for positioning
-        let maxX = max(margin, screenSize.width - margin)
-        let maxY = max(margin, screenSize.height - margin)
-        
-        // Move clock to a new random position, keeping it fully visible
-        clockPosition = CGPoint(
-            x: margin == maxX ? margin : CGFloat.random(in: margin...maxX),
-            y: margin == maxY ? margin : CGFloat.random(in: margin...maxY)
+        // Calculate next position
+        var newPosition = CGPoint(
+            x: clockPosition.x + velocity.x,
+            y: clockPosition.y + velocity.y
         )
-        clockBaseColor = Color.random
+        
+        // Bounce off edges
+        if newPosition.x <= margin || newPosition.x >= screenSize.width - margin {
+            velocity.x = -velocity.x
+            newPosition.x = clockPosition.x + velocity.x
+            
+            // Add some randomness to prevent predictable bouncing
+            velocity.y += CGFloat.random(in: -0.2...0.2)
+            velocity.y = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.y))
+        }
+        
+        if newPosition.y <= margin || newPosition.y >= screenSize.height - margin {
+            velocity.y = -velocity.y
+            newPosition.y = clockPosition.y + velocity.y
+            
+            // Add some randomness to prevent predictable bouncing
+            velocity.x += CGFloat.random(in: -0.2...0.2)
+            velocity.x = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.x))
+        }
+        
+        // Ensure position stays within bounds
+        newPosition.x = max(margin, min(screenSize.width - margin, newPosition.x))
+        newPosition.y = max(margin, min(screenSize.height - margin, newPosition.y))
+        
+        clockPosition = newPosition
+    }
+    
+    private func changeDirection() {
+        // Slightly adjust direction for more organic movement
+        let angleChange = Double.random(in: -0.5...0.5) // Radians
+        let currentAngle = atan2(velocity.y, velocity.x)
+        let newAngle = currentAngle + angleChange
+        
+        // Vary speed slightly
+        let speedVariation = CGFloat.random(in: 0.5...1.5)
+        let newSpeed = baseSpeed * speedVariation
+        
+        velocity = CGPoint(
+            x: cos(newAngle) * newSpeed,
+            y: sin(newAngle) * newSpeed
+        )
+    }
+    
+    private func changeColor() {
+        withAnimation(.easeInOut(duration: 2.0)) {
+            clockBaseColor = Color.random
+        }
+    }
+    
+    private func updateBoundaries() {
+        // Ensure clock stays within new bounds if screen size changes
+        guard screenSize != .zero else { return }
+        
+        let clockSize = calculateClockSize(for: screenSize)
+        let margin = clockSize / 2
+        
+        clockPosition.x = max(margin, min(screenSize.width - margin, clockPosition.x))
+        clockPosition.y = max(margin, min(screenSize.height - margin, clockPosition.y))
+    }
+    
+    // Legacy function kept for backward compatibility but simplified
+    private func repositionClock() {
+        setupInitialPosition()
     }
 }
 
