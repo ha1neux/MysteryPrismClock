@@ -700,8 +700,9 @@ func hourPath(
 ) -> Path {
     let angle = (.pi / 6.0) * timeComponents.hours
     let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
-    let radius = clockSize * inset / 2.5
-    
+//    let radius = clockSize * inset / 2.5
+    let radius = max(8, min(160, clockSize * inset / 2.5))
+
     return ClockPaths.hourHandPath(center: center, radius: radius, angle: angle)
 }
 
