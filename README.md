@@ -1,6 +1,8 @@
 # MysteryPrismClock
 A dynamic macOS screen saver featuring an animated clock with moving, color-changing elements.
 
+<a href="https://www.youtube.com/watch?v=WLEx7_kY8Ws" target="_blank">YouTube demo</a>
+
 <img width="662" height="423" alt="Screenshot 2025-10-27 at 9 34 06 AM" src="https://github.com/user-attachments/assets/aa96ed8f-a870-4022-a36b-490aaae03fc0" />
 
 
