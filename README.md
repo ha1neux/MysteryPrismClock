@@ -8,7 +8,6 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - **Dynamic Colors**: Clock colors change based on time components (seconds, minutes, hours)
 - **Background Changes**: Clock background changes smoothly every 30 seconds.
 - **Moving Clock**: The clock slowly wanders around the screen
-- **Smooth Animation**: 30 FPS animation with smooth second hand movement
 - **SwiftUI Implementation**: Built using modern SwiftUI within a ScreenSaver framework
 
 ## Installation
