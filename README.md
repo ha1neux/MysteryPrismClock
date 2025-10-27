@@ -1,6 +1,9 @@
 # MysteryPrismClock
 A dynamic macOS screen saver featuring an animated clock with moving, color-changing elements.
 
+<img width="662" height="423" alt="Screenshot 2025-10-27 at 9 34 06 AM" src="https://github.com/user-attachments/assets/aa96ed8f-a870-4022-a36b-490aaae03fc0" />
+
+
 ## Features
 - **Dynamic Colors**: Clock colors change based on time components (seconds, minutes, hours)
 - **Background Changes**: Clock background changes smoothly every 30 seconds.
