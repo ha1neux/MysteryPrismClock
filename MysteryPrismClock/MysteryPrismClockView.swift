@@ -648,8 +648,8 @@ extension Color {
     static var random: Color {
         Color(
             hue: Double.random(in: 0...1),
-            saturation: 0.9,
-            brightness: 0.8
+            saturation: Double.random(in: 0.3...0.6),
+            brightness: Double.random(in: 0.7...0.9)
         )
     }
     
