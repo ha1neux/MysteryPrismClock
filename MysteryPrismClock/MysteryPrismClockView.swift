@@ -29,23 +29,19 @@ struct MysteryPrismClockView: View {
     
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
-    private let minClockSize: CGFloat = 200.0
-    private let maxClockSize: CGFloat = 600.0
     private let inset: CGFloat = 0.8
     private var insetPrime: CGFloat { (1.0 - inset) / 2 }
     
     // Movement constants
-    private let baseSpeed: CGFloat = 0.16 // Base movement speed (pixels per frame) - 1/5th of original
-    private let directionChangeInterval: TimeInterval = 15.0 // Change direction every 15 seconds
-    private let colorChangeInterval: TimeInterval = 30.0 // Change color every 30 seconds
+    private let baseSpeed: CGFloat = 0.16
+    private let directionChangeInterval: TimeInterval = 15.0
+    private let colorChangeInterval: TimeInterval = 30.0
     
     private func calculateClockSize(for geometry: CGSize) -> CGFloat {
         // Use the smaller dimension to ensure the clock fits
         let baseDimension = min(geometry.width, geometry.height)
         let calculatedSize = baseDimension / clockSizeFactor
         
-        // Clamp the size to reasonable bounds
-//        return max(minClockSize, min(maxClockSize, calculatedSize))
         return calculatedSize
     }
     
@@ -205,9 +201,7 @@ struct MysteryPrismClockView: View {
     }
     
     private func changeColor() {
-        withAnimation(.easeInOut(duration: 2.0)) {
             clockBaseColor = Color.random
-        }
     }
     
     private func updateBoundaries() {
@@ -219,11 +213,6 @@ struct MysteryPrismClockView: View {
         
         clockPosition.x = max(margin, min(screenSize.width - margin, clockPosition.x))
         clockPosition.y = max(margin, min(screenSize.height - margin, clockPosition.y))
-    }
-    
-    // Legacy function kept for backward compatibility but simplified
-    private func repositionClock() {
-        setupInitialPosition()
     }
 }
 
@@ -264,7 +253,7 @@ struct ClockView: View {
         
     var body: some View {
         ZStack {
-            // Clock frame with gray border
+            // Clock frame with gray border and filled with clockBaseColor
             RoundedRectangle(cornerRadius: clockSize * insetPrime)
                 .fill(clockBaseColor)
                 .stroke(Color.gray, lineWidth: clockSize * insetPrime / 6.5)
@@ -343,7 +332,6 @@ struct SecondsDisk: View {
     }
 }
 
-// Function to create minute hand view
 func MinuteHand(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
     clockSize: CGFloat,
@@ -359,7 +347,6 @@ func MinuteHand(
     )
 }
 
-// Function to create hour hand view
 func HourHand(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
     clockSize: CGFloat,
@@ -375,7 +362,6 @@ func HourHand(
     )
 }
 
-// Function to create minute-hour overlap view
 func MinuteHourOverlap(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
     clockSize: CGFloat,
@@ -390,7 +376,6 @@ func MinuteHourOverlap(
     )
 }
 
-// Function to create minute-hour-seconds overlap view
 func MinuteHourSecondsOverlap(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
     clockSize: CGFloat,
