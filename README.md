@@ -1,5 +1,5 @@
 # MysteryPrismClock
-A dynamic macOS screen saver featuring an animated clock with moving, color-changing elements. (Made with the assistance of <a href="https://claude.ai" target="_blank">claude.ai</a>
+A dynamic macOS screen saver featuring an animated clock with moving, color-changing elements. (Made with the assistance of <a href="https://claude.ai" target="_blank">claude.ai</a>)
 
 <a href="https://www.youtube.com/watch?v=WLEx7_kY8Ws" target="_blank">YouTube demo</a>
 
