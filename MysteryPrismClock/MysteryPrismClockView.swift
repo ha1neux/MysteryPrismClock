@@ -27,6 +27,12 @@ struct MysteryPrismClockView: View {
     @State private var targetPosition = CGPoint.zero
     @State private var isMoving = false
     
+    // Color transition properties
+    @State private var colorTransitionTimer: Timer?
+    @State private var oldClockBaseColor = Color.random
+    @State private var isTransitioningColor = false
+    @State private var colorTransitionProgress: Double = 0.0
+    
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
     private let inset: CGFloat = 0.8
@@ -144,6 +150,8 @@ struct MysteryPrismClockView: View {
         timer = nil
         movementTimer?.invalidate()
         movementTimer = nil
+        colorTransitionTimer?.invalidate()
+        colorTransitionTimer = nil
     }
     
     private func updateClockPosition() {
@@ -201,7 +209,56 @@ struct MysteryPrismClockView: View {
     }
     
     private func changeColor() {
-            clockBaseColor = Color.random
+        startColorTransition()
+    }
+    
+    private func startColorTransition() {
+        guard !isTransitioningColor else { return }
+        
+        // Store the old color and generate a new one
+        oldClockBaseColor = clockBaseColor
+        let newColor = Color.random
+        
+        // Start the transition
+        isTransitioningColor = true
+        colorTransitionProgress = 0.0
+        
+        // Create a timer that runs 60 times per second for 2 seconds (120 total frames)
+        var frameCount = 0
+        let totalFrames = 120 // 60 FPS * 2 seconds
+        
+        colorTransitionTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { timer in
+            frameCount += 1
+            colorTransitionProgress = Double(frameCount) / Double(totalFrames)
+            
+            // Interpolate between old and new colors
+            clockBaseColor = interpolateColor(from: oldClockBaseColor, to: newColor, progress: colorTransitionProgress)
+            
+            // End transition when complete
+            if frameCount >= totalFrames {
+                timer.invalidate()
+                colorTransitionTimer = nil
+                isTransitioningColor = false
+                colorTransitionProgress = 0.0
+                clockBaseColor = newColor // Ensure we end up with the exact target color
+            }
+        }
+    }
+    
+    private func interpolateColor(from startColor: Color, to endColor: Color, progress: Double) -> Color {
+        let startHSB = startColor.hsb
+        let endHSB = endColor.hsb
+        
+        // Interpolate each HSB component
+        let interpolatedHue = startHSB.hue + (endHSB.hue - startHSB.hue) * progress
+        let interpolatedSaturation = startHSB.saturation + (endHSB.saturation - startHSB.saturation) * progress
+        let interpolatedBrightness = startHSB.brightness + (endHSB.brightness - startHSB.brightness) * progress
+        
+        return Color(
+            hue: interpolatedHue,
+            saturation: interpolatedSaturation,
+            brightness: interpolatedBrightness
+        )
     }
     
     private func updateBoundaries() {
