@@ -1,5 +1,5 @@
 # MysteryPrismClock
-A dynamic macOS screen saver featuring an animated clock with moving, color-changing elements.
+A dynamic macOS screen saver featuring an animated clock with moving, color-changing elements. (Made with the assistance of <a href="https://claude.ai" target="_blank">claude.ai</a>
 
 <a href="https://www.youtube.com/watch?v=WLEx7_kY8Ws" target="_blank">YouTube demo</a>
 
@@ -12,7 +12,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - **Moving Clock**: The clock slowly wanders around the screen
 - **SwiftUI Implementation**: Built using modern SwiftUI within a ScreenSaver framework
 
-## Installation
+## Build/Installation
 1. Clone this repository
 2. Open the project in Xcode
 3. Build the screen saver target
