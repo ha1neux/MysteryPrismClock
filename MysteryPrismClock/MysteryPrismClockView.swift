@@ -21,6 +21,7 @@ struct MysteryPrismClockView: View {
     
     @State private var timer: Timer?
     @State private var movementTimer: Timer?
+    @State private var loggingTimer: Timer?
     
     // Movement properties for smooth sliding
     @State private var velocity = CGPoint(x: 1.0, y: 0.5)
@@ -32,6 +33,10 @@ struct MysteryPrismClockView: View {
     @State private var oldClockBaseColor = Color.random
     @State private var isTransitioningColor = false
     @State private var colorTransitionProgress: Double = 0.0
+    
+    // Debug information
+    @State private var debugInfo: String = "Debug mode active - waiting for data..."
+    @State private var showDebugInfo = true // Toggle this to true to see debug info
     
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
@@ -68,13 +73,46 @@ struct MysteryPrismClockView: View {
                 )
                 .position(clockPosition == .zero ? CGPoint(x: geometry.size.width/2, y: geometry.size.height/2) : clockPosition)
                 .animation(.linear(duration: 1/60.0), value: clockPosition) // Smooth animation for position changes
+                
+                // Debug information overlay - make it more prominent
+                if showDebugInfo {
+                    VStack {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("DEBUG MODE ACTIVE")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Text("Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                Text("Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                Text(debugInfo)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(12)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(8)
+                            Spacer()
+                        }
+                        .padding()
+                        Spacer()
+                    }
+                }
             }
             .onAppear {
+                // Initialize debug info immediately
+                debugInfo = "Loading debug info..."
+                
                 // Add a small delay to ensure geometry is properly initialized
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     screenSize = geometry.size
                     setupInitialClock()
                     startTimers()
+                    // Update debug info immediately after setup
+                    updateDebugInfo()
                 }
             }
             .onDisappear {
@@ -110,8 +148,8 @@ struct MysteryPrismClockView: View {
         // Random initial direction
         let angle = Double.random(in: 0...(2 * .pi))
         velocity = CGPoint(
-            x: cos(angle) * baseSpeed,
-            y: sin(angle) * baseSpeed
+            x: Foundation.cos(angle) * baseSpeed,
+            y: Foundation.sin(angle) * baseSpeed
         )
     }
     
@@ -143,6 +181,13 @@ struct MysteryPrismClockView: View {
                 changeColor()
             }
         }
+        
+        // Timer for updating debug info (once per second)
+        loggingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            Task { @MainActor in
+                updateDebugInfo()
+            }
+        }
     }
     
     private func stopTimers() {
@@ -152,6 +197,8 @@ struct MysteryPrismClockView: View {
         movementTimer = nil
         colorTransitionTimer?.invalidate()
         colorTransitionTimer = nil
+        loggingTimer?.invalidate()
+        loggingTimer = nil
     }
     
     private func updateClockPosition() {
@@ -203,8 +250,8 @@ struct MysteryPrismClockView: View {
         let newSpeed = baseSpeed * speedVariation
         
         velocity = CGPoint(
-            x: cos(newAngle) * newSpeed,
-            y: sin(newAngle) * newSpeed
+            x: Foundation.cos(newAngle) * newSpeed,
+            y: Foundation.sin(newAngle) * newSpeed
         )
     }
     
@@ -270,6 +317,51 @@ struct MysteryPrismClockView: View {
         
         clockPosition.x = max(margin, min(screenSize.width - margin, clockPosition.x))
         clockPosition.y = max(margin, min(screenSize.height - margin, clockPosition.y))
+    }
+    
+    private func updateDebugInfo() {
+        // Calculate time components for debug display
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute, .second], from: currentTime)
+        let intHours = components.hour ?? 0
+        let intMinutes = components.minute ?? 0
+        let intSeconds = components.second ?? 0
+        
+        // Get fractional seconds for smooth animation
+        let timeInterval = currentTime.timeIntervalSince1970
+        let fractionalSeconds = timeInterval - floor(timeInterval)
+        
+        var seconds = Double(intSeconds) + fractionalSeconds
+        if seconds >= 60.0 { seconds -= 60.0 }
+        
+        var minutes = Double(intMinutes) + (seconds / 60.0)
+        if minutes >= 60.0 { minutes -= 60.0 }
+        
+        var hours = Double(intHours) + (minutes / 60.0)
+        if hours >= 12.0 { hours -= 12.0 }
+        
+        // Calculate hour hand path parameters
+        let clockSize = calculateClockSize(for: screenSize)
+        let angle = (.pi / 6.0) * hours
+        let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
+        let radius = max(8, min(160, clockSize * inset / 2.5))
+        
+        // Calculate the hour hand tip position
+        let tipPoint = CGPoint(
+            x: center.x + radius * Foundation.sin(angle),
+            y: center.y - radius * Foundation.cos(angle)
+        )
+        
+        // Format debug information
+        debugInfo = """
+        Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))
+        Velocity: (\(String(format: "%.3f", velocity.x)), \(String(format: "%.3f", velocity.y)))
+        Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
+        Hour Hand: \(String(format: "%.3f", hours))h, \(String(format: "%.1f", angle * 180 / .pi))°
+        Hand Tip: (\(String(format: "%.1f", tipPoint.x)), \(String(format: "%.1f", tipPoint.y)))
+        Clock Size: \(String(format: "%.1f", clockSize)), Radius: \(String(format: "%.1f", radius))
+        Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
+        """
     }
 }
 
@@ -378,8 +470,8 @@ struct SecondsDisk: View {
         let radius = clockSize * inset / 3.0
         let angle = 2.0 * .pi * timeSeconds / 60.0
         let offset = CGPoint(
-            x: radius * sin(angle) / 2.0,
-            y: radius * cos(angle) / 2.0
+            x: radius * Foundation.sin(angle) / 2.0,
+            y: radius * Foundation.cos(angle) / 2.0
         )
         
         Circle()
@@ -716,8 +808,8 @@ func secondsPath(
     let angle = 2.0 * .pi * timeComponents.seconds / 60.0
     let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
     let offset = CGPoint(
-        x: radius * sin(angle) / 2.0,
-        y: radius * cos(angle) / 2.0
+        x: radius * Foundation.sin(angle) / 2.0,
+        y: radius * Foundation.cos(angle) / 2.0
     )
     
     let circleCenter = CGPoint(
@@ -742,16 +834,16 @@ struct ClockPaths {
             let radius2 = radius / 2.5
             
             let point1 = CGPoint(
-                x: center.x + radius1 * sin(angle),
-                y: center.y - radius1 * cos(angle)
+                x: center.x + radius1 * Foundation.sin(angle),
+                y: center.y - radius1 * Foundation.cos(angle)
             )
             let point2 = CGPoint(
-                x: center.x + radius2 * sin(angle + .pi/2),
-                y: center.y - radius2 * cos(angle + .pi/2)
+                x: center.x + radius2 * Foundation.sin(angle + .pi/2),
+                y: center.y - radius2 * Foundation.cos(angle + .pi/2)
             )
             let point3 = CGPoint(
-                x: center.x + radius2 * sin(angle - .pi/2),
-                y: center.y - radius2 * cos(angle - .pi/2)
+                x: center.x + radius2 * Foundation.sin(angle - .pi/2),
+                y: center.y - radius2 * Foundation.cos(angle - .pi/2)
             )
             
             path.move(to: point1)
@@ -767,16 +859,16 @@ struct ClockPaths {
             let radius2 = radius / 2
             
             let point1 = CGPoint(
-                x: center.x + radius1 * sin(angle),
-                y: center.y - radius1 * cos(angle)
+                x: center.x + radius1 * Foundation.sin(angle),
+                y: center.y - radius1 * Foundation.cos(angle)
             )
             let point2 = CGPoint(
-                x: center.x + radius2 * sin(angle + .pi/2),
-                y: center.y - radius2 * cos(angle + .pi/2)
+                x: center.x + radius2 * Foundation.sin(angle + .pi/2),
+                y: center.y - radius2 * Foundation.cos(angle + .pi/2)
             )
             let point3 = CGPoint(
-                x: center.x + radius2 * sin(angle - .pi/2),
-                y: center.y - radius2 * cos(angle - .pi/2)
+                x: center.x + radius2 * Foundation.sin(angle - .pi/2),
+                y: center.y - radius2 * Foundation.cos(angle - .pi/2)
             )
             
             path.move(to: point1)
