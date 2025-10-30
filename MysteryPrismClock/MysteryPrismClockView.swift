@@ -36,7 +36,7 @@ struct MysteryPrismClockView: View {
     
     // Debug information
     @State private var debugInfo: String = "Debug mode active - waiting for data..."
-    @State private var showDebugInfo = true // Toggle this to true to see debug info
+    @State private var showDebugInfo = false // Will be controlled by Caps Lock
     
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
@@ -79,15 +79,6 @@ struct MysteryPrismClockView: View {
                     VStack {
                         HStack {
                             VStack(alignment: .leading) {
-                                Text("DEBUG MODE ACTIVE")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                Text("Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))")
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                Text("Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))")
-                                    .font(.caption)
-                                    .foregroundColor(.white)
                                 Text(debugInfo)
                                     .font(.system(.caption, design: .monospaced))
                                     .foregroundColor(.white)
@@ -158,6 +149,7 @@ struct MysteryPrismClockView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1/30.0, repeats: true) { _ in
             Task { @MainActor in
                 currentTime = Date()
+                updateCapsLockState() // Check caps lock state with every frame
             }
         }
         
@@ -339,12 +331,12 @@ struct MysteryPrismClockView: View {
         
         var hours = Double(intHours) + (minutes / 60.0)
         if hours >= 12.0 { hours -= 12.0 }
-        
+                
         // Calculate hour hand path parameters
         let clockSize = calculateClockSize(for: screenSize)
         let angle = (.pi / 6.0) * hours
         let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
-        let radius = max(8, min(160, clockSize * inset / 2.5))
+        let radius = clockSize * inset / 2.5
         
         // Calculate the hour hand tip position
         let tipPoint = CGPoint(
@@ -352,16 +344,26 @@ struct MysteryPrismClockView: View {
             y: center.y - radius * Foundation.cos(angle)
         )
         
+        // Calculate clock disk radius
+        let clockRadius = clockSize * inset / 2
+        
         // Format debug information
         debugInfo = """
+        Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
+        Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
         Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))
         Velocity: (\(String(format: "%.3f", velocity.x)), \(String(format: "%.3f", velocity.y)))
-        Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
         Hour Hand: \(String(format: "%.3f", hours))h, \(String(format: "%.1f", angle * 180 / .pi))°
-        Hand Tip: (\(String(format: "%.1f", tipPoint.x)), \(String(format: "%.1f", tipPoint.y)))
-        Clock Size: \(String(format: "%.1f", clockSize)), Radius: \(String(format: "%.1f", radius))
-        Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
+        Hour hand Tip: (\(String(format: "%.1f", tipPoint.x)), \(String(format: "%.1f", tipPoint.y)))
+        Hour hand radius: \(String(format: "%.1f",radius))
+        Clock radius: \(String(format: "%.1f", clockRadius))
         """
+    }
+    
+    private func updateCapsLockState() {
+        #if canImport(AppKit)
+        showDebugInfo = NSEvent.modifierFlags.contains(.capsLock)
+        #endif
     }
 }
 
@@ -627,7 +629,7 @@ struct MinuteHourOverlapView: View {
         // Create paths for both hands
         let minutePath = ClockPaths.minuteHandPath(
             center: center,
-            radius: max(10, min(200, clockSize * inset / 2.0)),
+            radius: clockSize * inset / 2.0,
             angle: minuteAngle
         )
         let hourPath = ClockPaths.hourHandPath(
@@ -779,7 +781,7 @@ func minutePath(
 ) -> Path {
     let angle = (.pi / 30.0) * timeComponents.minutes
     let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
-    let radius = max(10, min(200, clockSize * inset / 2.0))
+    let radius = clockSize * inset / 2.0
     
     return ClockPaths.minuteHandPath(center: center, radius: radius, angle: angle)
 }
@@ -792,8 +794,7 @@ func hourPath(
 ) -> Path {
     let angle = (.pi / 6.0) * timeComponents.hours
     let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
-//    let radius = clockSize * inset / 2.5
-    let radius = max(8, min(160, clockSize * inset / 2.5))
+    let radius = clockSize * inset / 2.5
 
     return ClockPaths.hourHandPath(center: center, radius: radius, angle: angle)
 }

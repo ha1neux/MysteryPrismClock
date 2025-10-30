@@ -6,8 +6,13 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		446057FC2EB3F7F200F38C51 /* notarize_saver.sh in Resources */ = {isa = PBXBuildFile; fileRef = 446057FB2EB3F7F200F38C51 /* notarize_saver.sh */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		446057FB2EB3F7F200F38C51 /* notarize_saver.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = notarize_saver.sh; sourceTree = "<group>"; };
 		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -29,6 +34,7 @@
 		44483AC12EA452BD00F49641 = {
 			isa = PBXGroup;
 			children = (
+				446057FB2EB3F7F200F38C51 /* notarize_saver.sh */,
 				44A6FDC22EA4930F006854BE /* .gitignore */,
 				44483ACD2EA452BD00F49641 /* MysteryPrismClock */,
 				44483ACC2EA452BD00F49641 /* Products */,
@@ -118,6 +124,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				446057FC2EB3F7F200F38C51 /* notarize_saver.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,10 +272,10 @@
 				DEVELOPMENT_TEAM = RUHYK57MF9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSPrincipalClass = MysteryPrismClockView;
+				INFOPLIST_KEY_NSPrincipalClass = "$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.3b5;
+				MARKETING_VERSION = 1.3b6;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moxiesoftware.MysteryPrismClock;
 				PRODUCT_NAME = MysteryPrism;
@@ -294,10 +301,10 @@
 				DEVELOPMENT_TEAM = RUHYK57MF9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSPrincipalClass = MysteryPrismClockView;
+				INFOPLIST_KEY_NSPrincipalClass = "$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.3b5;
+				MARKETING_VERSION = 1.3b6;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moxiesoftware.MysteryPrismClock;
 				PRODUCT_NAME = MysteryPrism;
