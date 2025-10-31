@@ -22,6 +22,8 @@ struct MysteryPrismClockView: View {
     @State private var timer: Timer?
     @State private var movementTimer: Timer?
     @State private var loggingTimer: Timer?
+    @State private var directionChangeTimer: Timer?
+    @State private var colorChangeTimer: Timer?
     
     // Movement properties for smooth sliding
     @State private var velocity = CGPoint(x: 1.0, y: 0.5)
@@ -161,14 +163,14 @@ struct MysteryPrismClockView: View {
         }
         
         // Timer for periodic direction changes
-        Timer.scheduledTimer(withTimeInterval: directionChangeInterval, repeats: true) { _ in
+        directionChangeTimer = Timer.scheduledTimer(withTimeInterval: directionChangeInterval, repeats: true) { _ in
             Task { @MainActor in
                 changeDirection()
             }
         }
         
         // Timer for periodic color changes
-        Timer.scheduledTimer(withTimeInterval: colorChangeInterval, repeats: true) { _ in
+        colorChangeTimer = Timer.scheduledTimer(withTimeInterval: colorChangeInterval, repeats: true) { _ in
             Task { @MainActor in
                 changeColor()
             }
@@ -191,6 +193,10 @@ struct MysteryPrismClockView: View {
         colorTransitionTimer = nil
         loggingTimer?.invalidate()
         loggingTimer = nil
+        directionChangeTimer?.invalidate()
+        directionChangeTimer = nil
+        colorChangeTimer?.invalidate()
+        colorChangeTimer = nil
     }
     
     private func updateClockPosition() {
