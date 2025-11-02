@@ -5,40 +5,16 @@
 //  Created by Bill Coderre on 10/18/25.
 //
 
+#if os(macOS)
 import SwiftUI
 import Foundation
-#if canImport(UIKit)
-import UIKit
-#elseif canImport(AppKit)
 import AppKit
-#endif
+
+// Ensure FileLogger and SharedTimerManager are available
+// These should be defined in Logger.swift and MysteryPrismScreenSaver.swift
 
 struct MysteryPrismClockView: View {
-    @State private var currentTime = Date()
-    @State private var clockPosition = CGPoint.zero
-    @State private var clockBaseColor = Color.random
-    @State private var screenSize = CGSize.zero
-    
-    @State private var timer: Timer?
-    @State private var movementTimer: Timer?
-    @State private var loggingTimer: Timer?
-    @State private var directionChangeTimer: Timer?
-    @State private var colorChangeTimer: Timer?
-    
-    // Movement properties for smooth sliding
-    @State private var velocity = CGPoint(x: 1.0, y: 0.5)
-    @State private var targetPosition = CGPoint.zero
-    @State private var isMoving = false
-    
-    // Color transition properties
-    @State private var colorTransitionTimer: Timer?
-    @State private var oldClockBaseColor = Color.random
-    @State private var isTransitioningColor = false
-    @State private var colorTransitionProgress: Double = 0.0
-    
-    // Debug information
-    @State private var debugInfo: String = "Debug mode active - waiting for data..."
-    @State private var showDebugInfo = false // Will be controlled by Caps Lock
+    @StateObject private var viewModel = ClockViewModel()
     
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
@@ -46,7 +22,6 @@ struct MysteryPrismClockView: View {
     private var insetPrime: CGFloat { (1.0 - inset) / 2 }
     
     // Movement constants
-    private let baseSpeed: CGFloat = 0.16
     private let directionChangeInterval: TimeInterval = 15.0
     private let colorChangeInterval: TimeInterval = 30.0
     
@@ -67,21 +42,20 @@ struct MysteryPrismClockView: View {
                 
                 // Clock
                 ClockView(
-                    time: currentTime,
-                    clockBaseColor: clockBaseColor,
+                    time: viewModel.currentTime,
+                    clockBaseColor: viewModel.clockBaseColor,
                     clockSize: calculateClockSize(for: geometry.size),
                     inset: inset,
                     insetPrime: insetPrime
                 )
-                .position(clockPosition == .zero ? CGPoint(x: geometry.size.width/2, y: geometry.size.height/2) : clockPosition)
-                .animation(.linear(duration: 1/60.0), value: clockPosition) // Smooth animation for position changes
+                .position(viewModel.clockPosition == .zero ? CGPoint(x: geometry.size.width/2, y: geometry.size.height/2) : viewModel.clockPosition)
                 
-                // Debug information overlay - make it more prominent
-                if showDebugInfo {
+                // Debug information overlay
+                if viewModel.showDebugInfo {
                     VStack {
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(debugInfo)
+                                Text(viewModel.debugInfo)
                                     .font(.system(.caption, design: .monospaced))
                                     .foregroundColor(.white)
                             }
@@ -96,280 +70,46 @@ struct MysteryPrismClockView: View {
                 }
             }
             .onAppear {
-                // Initialize debug info immediately
-                debugInfo = "Loading debug info..."
+                // Log startup
+                FileLogger.shared.logSeparator("VIEW APPEARED")
+                FileLogger.shared.info("Clock view appeared - Screen size: \(geometry.size)")
+                
+                // Register this view model with the shared instance
+                SharedTimerManager.shared.currentViewModel = viewModel
+                SharedTimerManager.shared.currentTimerManager = nil // Clear old reference
+                
+                FileLogger.shared.info("Clock view: Registered viewModel[\(ObjectIdentifier(viewModel).hashValue)] with SharedTimerManager")
                 
                 // Add a small delay to ensure geometry is properly initialized
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    screenSize = geometry.size
-                    setupInitialClock()
-                    startTimers()
-                    // Update debug info immediately after setup
-                    updateDebugInfo()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak viewModel] in
+                    guard let viewModel = viewModel else { 
+                        FileLogger.shared.warning("Clock view: viewModel was nil in onAppear delayed block")
+                        return 
+                    }
+                    viewModel.setupInitialClock(screenSize: geometry.size)
+                    FileLogger.shared.info("Clock initialized and ready for viewModel[\(ObjectIdentifier(viewModel).hashValue)]")
                 }
             }
             .onDisappear {
-                stopTimers()
+                // Stop accepting updates immediately and clear references
+                FileLogger.shared.logSeparator("VIEW DISAPPEARED")
+                FileLogger.shared.info("Clock view disappeared - stopping updates for viewModel[\(ObjectIdentifier(viewModel).hashValue)]")
+                
+                // First stop the view model from accepting updates
+                viewModel.stopUpdating()
+                
+                // Then immediately clear the shared references so animateOneFrame stops calling it
+                FileLogger.shared.info("Clock view: Clearing SharedTimerManager.currentViewModel to prevent further animateOneFrame calls")
+                SharedTimerManager.shared.currentViewModel = nil
+                SharedTimerManager.shared.currentTimerManager = nil
+                
+                FileLogger.shared.info("Clock view: Cleared SharedTimerManager references")
             }
             .onChange(of: geometry.size) { oldSize, newSize in
-                screenSize = newSize
-                if clockPosition == .zero {
-                    setupInitialPosition()
-                }
-                updateBoundaries()
+                FileLogger.shared.debug("Screen size changed from \(oldSize) to \(newSize)")
+                viewModel.screenSize = newSize
             }
         }
-    }
-    
-    private func setupInitialClock() {
-        clockBaseColor = Color.random
-        setupInitialPosition()
-        setupInitialVelocity()
-    }
-    
-    private func setupInitialPosition() {
-        guard screenSize != .zero else { return }
-        
-        // Start at center of screen
-        clockPosition = CGPoint(
-            x: screenSize.width / 2,
-            y: screenSize.height / 2
-        )
-    }
-    
-    private func setupInitialVelocity() {
-        // Random initial direction
-        let angle = Double.random(in: 0...(2 * .pi))
-        velocity = CGPoint(
-            x: Foundation.cos(angle) * baseSpeed,
-            y: Foundation.sin(angle) * baseSpeed
-        )
-    }
-    
-    private func startTimers() {
-        // Timer for updating the clock time (30 FPS)
-        timer = Timer.scheduledTimer(withTimeInterval: 1/30.0, repeats: true) { _ in
-            Task { @MainActor in
-                currentTime = Date()
-                updateCapsLockState() // Check caps lock state with every frame
-            }
-        }
-        
-        // Timer for smooth movement (60 FPS)
-        movementTimer = Timer.scheduledTimer(withTimeInterval: 1/60.0, repeats: true) { _ in
-            Task { @MainActor in
-                updateClockPosition()
-            }
-        }
-        
-        // Timer for periodic direction changes
-        directionChangeTimer = Timer.scheduledTimer(withTimeInterval: directionChangeInterval, repeats: true) { _ in
-            Task { @MainActor in
-                changeDirection()
-            }
-        }
-        
-        // Timer for periodic color changes
-        colorChangeTimer = Timer.scheduledTimer(withTimeInterval: colorChangeInterval, repeats: true) { _ in
-            Task { @MainActor in
-                changeColor()
-            }
-        }
-        
-        // Timer for updating debug info (once per second)
-        loggingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            Task { @MainActor in
-                updateDebugInfo()
-            }
-        }
-    }
-    
-    private func stopTimers() {
-        timer?.invalidate()
-        timer = nil
-        movementTimer?.invalidate()
-        movementTimer = nil
-        colorTransitionTimer?.invalidate()
-        colorTransitionTimer = nil
-        loggingTimer?.invalidate()
-        loggingTimer = nil
-        directionChangeTimer?.invalidate()
-        directionChangeTimer = nil
-        colorChangeTimer?.invalidate()
-        colorChangeTimer = nil
-    }
-    
-    private func updateClockPosition() {
-        guard screenSize != .zero else { return }
-        
-        let clockSize = calculateClockSize(for: screenSize)
-        let margin = clockSize / 2
-        
-        // Calculate next position
-        var newPosition = CGPoint(
-            x: clockPosition.x + velocity.x,
-            y: clockPosition.y + velocity.y
-        )
-        
-        // Bounce off edges
-        if newPosition.x <= margin || newPosition.x >= screenSize.width - margin {
-            velocity.x = -velocity.x
-            newPosition.x = clockPosition.x + velocity.x
-            
-            // Add some randomness to prevent predictable bouncing
-            velocity.y += CGFloat.random(in: -0.2...0.2)
-            velocity.y = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.y))
-        }
-        
-        if newPosition.y <= margin || newPosition.y >= screenSize.height - margin {
-            velocity.y = -velocity.y
-            newPosition.y = clockPosition.y + velocity.y
-            
-            // Add some randomness to prevent predictable bouncing
-            velocity.x += CGFloat.random(in: -0.2...0.2)
-            velocity.x = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.x))
-        }
-        
-        // Ensure position stays within bounds
-        newPosition.x = max(margin, min(screenSize.width - margin, newPosition.x))
-        newPosition.y = max(margin, min(screenSize.height - margin, newPosition.y))
-        
-        clockPosition = newPosition
-    }
-    
-    private func changeDirection() {
-        // Slightly adjust direction for more organic movement
-        let angleChange = Double.random(in: -0.5...0.5) // Radians
-        let currentAngle = atan2(velocity.y, velocity.x)
-        let newAngle = currentAngle + angleChange
-        
-        // Vary speed slightly
-        let speedVariation = CGFloat.random(in: 0.5...1.5)
-        let newSpeed = baseSpeed * speedVariation
-        
-        velocity = CGPoint(
-            x: Foundation.cos(newAngle) * newSpeed,
-            y: Foundation.sin(newAngle) * newSpeed
-        )
-    }
-    
-    private func changeColor() {
-        startColorTransition()
-    }
-    
-    private func startColorTransition() {
-        guard !isTransitioningColor else { return }
-        
-        // Store the old color and generate a new one
-        oldClockBaseColor = clockBaseColor
-        let newColor = Color.random
-        
-        // Start the transition
-        isTransitioningColor = true
-        colorTransitionProgress = 0.0
-        
-        // Create a timer that runs 60 times per second for 2 seconds (120 total frames)
-        var frameCount = 0
-        let totalFrames = 120 // 60 FPS * 2 seconds
-        
-        colorTransitionTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { timer in
-            frameCount += 1
-            colorTransitionProgress = Double(frameCount) / Double(totalFrames)
-            
-            // Interpolate between old and new colors
-            clockBaseColor = interpolateColor(from: oldClockBaseColor, to: newColor, progress: colorTransitionProgress)
-            
-            // End transition when complete
-            if frameCount >= totalFrames {
-                timer.invalidate()
-                colorTransitionTimer = nil
-                isTransitioningColor = false
-                colorTransitionProgress = 0.0
-                clockBaseColor = newColor // Ensure we end up with the exact target color
-            }
-        }
-    }
-    
-    private func interpolateColor(from startColor: Color, to endColor: Color, progress: Double) -> Color {
-        let startHSB = startColor.hsb
-        let endHSB = endColor.hsb
-        
-        // Interpolate each HSB component
-        let interpolatedHue = startHSB.hue + (endHSB.hue - startHSB.hue) * progress
-        let interpolatedSaturation = startHSB.saturation + (endHSB.saturation - startHSB.saturation) * progress
-        let interpolatedBrightness = startHSB.brightness + (endHSB.brightness - startHSB.brightness) * progress
-        
-        return Color(
-            hue: interpolatedHue,
-            saturation: interpolatedSaturation,
-            brightness: interpolatedBrightness
-        )
-    }
-    
-    private func updateBoundaries() {
-        // Ensure clock stays within new bounds if screen size changes
-        guard screenSize != .zero else { return }
-        
-        let clockSize = calculateClockSize(for: screenSize)
-        let margin = clockSize / 2
-        
-        clockPosition.x = max(margin, min(screenSize.width - margin, clockPosition.x))
-        clockPosition.y = max(margin, min(screenSize.height - margin, clockPosition.y))
-    }
-    
-    private func updateDebugInfo() {
-        // Calculate time components for debug display
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute, .second], from: currentTime)
-        let intHours = components.hour ?? 0
-        let intMinutes = components.minute ?? 0
-        let intSeconds = components.second ?? 0
-        
-        // Get fractional seconds for smooth animation
-        let timeInterval = currentTime.timeIntervalSince1970
-        let fractionalSeconds = timeInterval - floor(timeInterval)
-        
-        var seconds = Double(intSeconds) + fractionalSeconds
-        if seconds >= 60.0 { seconds -= 60.0 }
-        
-        var minutes = Double(intMinutes) + (seconds / 60.0)
-        if minutes >= 60.0 { minutes -= 60.0 }
-        
-        var hours = Double(intHours) + (minutes / 60.0)
-        if hours >= 12.0 { hours -= 12.0 }
-                
-        // Calculate hour hand path parameters
-        let clockSize = calculateClockSize(for: screenSize)
-        let angle = (.pi / 6.0) * hours
-        let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
-        let radius = clockSize * inset / 2.5
-        
-        // Calculate the hour hand tip position
-        let tipPoint = CGPoint(
-            x: center.x + radius * Foundation.sin(angle),
-            y: center.y - radius * Foundation.cos(angle)
-        )
-        
-        // Calculate clock disk radius
-        let clockRadius = clockSize * inset / 2
-        
-        // Format debug information
-        debugInfo = """
-        Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
-        Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
-        Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))
-        Velocity: (\(String(format: "%.3f", velocity.x)), \(String(format: "%.3f", velocity.y)))
-        Hour Hand: \(String(format: "%.3f", hours))h, \(String(format: "%.1f", angle * 180 / .pi))°
-        Hour hand Tip: (\(String(format: "%.1f", tipPoint.x)), \(String(format: "%.1f", tipPoint.y)))
-        Hour hand radius: \(String(format: "%.1f",radius))
-        Clock radius: \(String(format: "%.1f", clockRadius))
-        """
-    }
-    
-    private func updateCapsLockState() {
-        #if canImport(AppKit)
-        showDebugInfo = NSEvent.modifierFlags.contains(.capsLock)
-        #endif
     }
 }
 
@@ -754,23 +494,10 @@ extension Color {
     }
     
     var hsb: (hue: Double, saturation: Double, brightness: Double) {
-        // Convert SwiftUI Color to UIColor to extract HSB components
-        #if canImport(UIKit)
-        let uiColor = UIColor(self)
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        if uiColor.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
-            return (Double(hue), Double(saturation), Double(brightness))
-        }
-        #elseif canImport(AppKit)
         let nsColor = NSColor(self)
         if let hsb = nsColor.usingColorSpace(.deviceRGB) {
             return (Double(hsb.hueComponent), Double(hsb.saturationComponent), Double(hsb.brightnessComponent))
         }
-        #endif
         
         // Fallback values
         return (0.5, 0.9, 0.8)
@@ -886,6 +613,247 @@ struct ClockPaths {
     }
 }
 
+// Simple file logger for debugging
+// Observable object to manage timer lifecycle and state
+class ClockViewModel: ObservableObject {
+    @Published var currentTime = Date()
+    @Published var clockPosition = CGPoint.zero
+    @Published var clockBaseColor = Color.random
+    @Published var screenSize = CGSize.zero
+    @Published var velocity = CGPoint(x: 1.0, y: 0.5)
+    @Published var debugInfo: String = "Debug mode active - waiting for data..."
+    @Published var showDebugInfo = false
+    
+    private var lastDirectionChange: Date = Date()
+    private var lastColorChange: Date = Date()
+    private var lastDebugUpdate: Date = Date()
+    private var frameCount: Int = 0
+    private var isRunning = false
+    
+    // Add a counter to detect if we're still being updated after stop
+    private var updateCount: Int = 0
+    
+    private let baseSpeed: CGFloat = 0.16
+    private let inset: CGFloat = 0.8
+    private let clockSizeFactor: CGFloat = 2.0
+    private let directionChangeInterval: TimeInterval = 15.0
+    private let colorChangeInterval: TimeInterval = 30.0
+    private let colorTransitionDuration: TimeInterval = 2.0
+    
+    func setupInitialClock(screenSize: CGSize) {
+        self.screenSize = screenSize
+        clockBaseColor = Color.random
+        setupInitialPosition()
+        setupInitialVelocity()
+        isRunning = true // Start accepting updates
+        FileLogger.shared.info("ClockViewModel[\(ObjectIdentifier(self).hashValue)]: Ready to accept updates from animateOneFrame")
+    }
+    
+    // Called from the screensaver's animateOneFrame() method
+    func performSingleUpdate() {
+        guard isRunning else { return }
+        
+        updateCount += 1
+        frameCount += 1
+        let now = Date()
+        
+        let objectID = ObjectIdentifier(self).hashValue
+        
+        // Log every 120 frames (every 2 seconds at 60fps) to track activity
+        if updateCount % 120 == 0 {
+            FileLogger.shared.logTimerActivity(
+                source: "ClockViewModel[\(objectID)].performSingleUpdate",
+                updateCount: updateCount,
+                isRunning: isRunning
+            )
+        }
+        
+        // Update time
+        currentTime = now
+        
+        // Update position
+        updateClockPosition()
+        
+        // Update caps lock state
+        updateCapsLockState()
+        
+        // Direction change (every 15 seconds)
+        if now.timeIntervalSince(lastDirectionChange) >= directionChangeInterval {
+            changeDirection()
+            lastDirectionChange = now
+        }
+        
+        // Color change (every 30 seconds) - simple instant change
+        if now.timeIntervalSince(lastColorChange) >= colorChangeInterval {
+            clockBaseColor = Color.random
+            lastColorChange = now
+        }
+        
+        // Debug info (every second, ~60 frames)
+        if frameCount % 60 == 0 || now.timeIntervalSince(lastDebugUpdate) >= 1.0 {
+            updateDebugInfo()
+            lastDebugUpdate = now
+        }
+    }
+    
+    // Stop accepting updates
+    func stopUpdating() {
+        let objectID = ObjectIdentifier(self).hashValue
+        FileLogger.shared.logSeparator("STOP UPDATING")
+        FileLogger.shared.info("ClockViewModel[\(objectID)]: stopUpdating called - will stop accepting animateOneFrame updates")
+        isRunning = false
+        FileLogger.shared.info("ClockViewModel[\(objectID)]: Stopped at updateCount=\(updateCount)")
+    }
+    
+    private func setupInitialPosition() {
+        guard screenSize != .zero else { return }
+        clockPosition = CGPoint(
+            x: screenSize.width / 2,
+            y: screenSize.height / 2
+        )
+    }
+    
+    private func setupInitialVelocity() {
+        let angle = Double.random(in: 0...(2 * .pi))
+        velocity = CGPoint(
+            x: Foundation.cos(angle) * baseSpeed,
+            y: Foundation.sin(angle) * baseSpeed
+        )
+    }
+    
+
+    
+    private func calculateClockSize(for size: CGSize) -> CGFloat {
+        let baseDimension = min(size.width, size.height)
+        return baseDimension / clockSizeFactor
+    }
+    
+    private func updateClockPosition() {
+        guard screenSize != .zero else { return }
+        
+        let clockSize = calculateClockSize(for: screenSize)
+        let margin = clockSize / 2
+        
+        var newPosition = CGPoint(
+            x: clockPosition.x + velocity.x,
+            y: clockPosition.y + velocity.y
+        )
+        
+        if newPosition.x <= margin || newPosition.x >= screenSize.width - margin {
+            velocity.x = -velocity.x
+            newPosition.x = clockPosition.x + velocity.x
+            velocity.y += CGFloat.random(in: -0.2...0.2)
+            velocity.y = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.y))
+        }
+        
+        if newPosition.y <= margin || newPosition.y >= screenSize.height - margin {
+            velocity.y = -velocity.y
+            newPosition.y = clockPosition.y + velocity.y
+            velocity.x += CGFloat.random(in: -0.2...0.2)
+            velocity.x = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.x))
+        }
+        
+        newPosition.x = max(margin, min(screenSize.width - margin, newPosition.x))
+        newPosition.y = max(margin, min(screenSize.height - margin, newPosition.y))
+        
+        clockPosition = newPosition
+    }
+    
+    private func changeDirection() {
+        let angleChange = Double.random(in: -0.5...0.5)
+        let currentAngle = atan2(velocity.y, velocity.x)
+        let newAngle = currentAngle + angleChange
+        let speedVariation = CGFloat.random(in: 0.5...1.5)
+        let newSpeed = baseSpeed * speedVariation
+        
+        velocity = CGPoint(
+            x: Foundation.cos(newAngle) * newSpeed,
+            y: Foundation.sin(newAngle) * newSpeed
+        )
+    }
+    
+    private func updateDebugInfo() {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute, .second], from: currentTime)
+        let intHours = components.hour ?? 0
+        let intMinutes = components.minute ?? 0
+        let intSeconds = components.second ?? 0
+        
+        let timeInterval = currentTime.timeIntervalSince1970
+        let fractionalSeconds = timeInterval - floor(timeInterval)
+        
+        var seconds = Double(intSeconds) + fractionalSeconds
+        if seconds >= 60.0 { seconds -= 60.0 }
+        
+        var minutes = Double(intMinutes) + (seconds / 60.0)
+        if minutes >= 60.0 { minutes -= 60.0 }
+        
+        var hours = Double(intHours) + (minutes / 60.0)
+        if hours >= 12.0 { hours -= 12.0 }
+        
+        let clockSize = calculateClockSize(for: screenSize)
+        let angle = (.pi / 6.0) * hours
+        let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
+        let radius = clockSize * inset / 2.5
+        
+        let tipPoint = CGPoint(
+            x: center.x + radius * Foundation.sin(angle),
+            y: center.y - radius * Foundation.cos(angle)
+        )
+        
+        let clockRadius = clockSize * inset / 2
+        
+        debugInfo = """
+        Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
+        Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
+        Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))
+        Velocity: (\(String(format: "%.3f", velocity.x)), \(String(format: "%.3f", velocity.y))
+        Hour Hand: \(String(format: "%.3f", hours))h, \(String(format: "%.1f", angle * 180 / .pi))°
+        Hour hand Tip: (\(String(format: "%.1f", tipPoint.x)), \(String(format: "%.1f", tipPoint.y)))
+        Hour hand radius: \(String(format: "%.1f",radius))
+        Clock radius: \(String(format: "%.1f", clockRadius))
+        """
+    }
+    
+    private func updateCapsLockState() {
+        showDebugInfo = NSEvent.modifierFlags.contains(.capsLock)
+    }
+    
+    deinit {
+        let objectID = ObjectIdentifier(self).hashValue
+        FileLogger.shared.logLifecycle(
+            object: "ClockViewModel[\(objectID)]",
+            event: "deinit",
+            details: "finalUpdateCount=\(updateCount), isRunning=\(isRunning)"
+        )
+        stopUpdating()
+    }
+}
+
+// Legacy timer manager for compatibility
+class TimerManager: ObservableObject {
+    var timers: [Timer] = []
+    var isActive = true
+    
+    func addTimer(_ timer: Timer) {
+        timers.append(timer)
+    }
+    
+    func invalidateAll() {
+        isActive = false
+        for timer in timers {
+            timer.invalidate()
+        }
+        timers.removeAll()
+    }
+    
+    deinit {
+        invalidateAll()
+    }
+}
+
 #Preview {
     MysteryPrismClockView()
 }
+
+#endif // os(macOS)
