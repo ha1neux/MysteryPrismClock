@@ -5,7 +5,6 @@
 //  Created by Bill Coderre on 10/18/25.
 //
 
-#if os(macOS)
 import ScreenSaver
 import SwiftUI
 
@@ -47,6 +46,7 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     private var hasCleanedUp = false
     private var isStopped = false  // Flag to prevent any updates after stop
     private var hasBeenVisible = false  // Track if window has ever been visible
+    private var orphanDetectionTimer: Timer?  // Timer to detect if we're orphaned
     
     override init?(frame: NSRect, isPreview: Bool) {
         Self.instanceCounter += 1
@@ -126,10 +126,17 @@ class MysteryPrismScreenSaver: ScreenSaverView {
             event: "startAnimation",
             details: "Called by system - animation will be driven by animateOneFrame()"
         )
+        
+        // Start orphan detection - if we don't receive any animateOneFrame calls within 2 seconds,
+        // or if our window never becomes visible, we're probably an orphaned instance
+        startOrphanDetection()
     }
     
     override func stopAnimation() {
         super.stopAnimation()
+        
+        // Cancel orphan detection since we're stopping normally
+        cancelOrphanDetection()
         
         // IMMEDIATELY set flag to stop all updates
         isStopped = true
@@ -151,6 +158,9 @@ class MysteryPrismScreenSaver: ScreenSaverView {
             FileLogger.shared.warning("ScreenSaver[\(instanceID)]: performCleanup called again (reason: \(reason)) but already cleaned up - ignoring")
             return
         }
+        
+        // Cancel orphan detection timer if it's running
+        cancelOrphanDetection()
         
         hasCleanedUp = true
         FileLogger.shared.logSeparator("CLEANUP STARTED")
@@ -236,6 +246,12 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     override func animateOneFrame() {
         // This is called by the system at the interval specified in animationTimeInterval
         
+        // Mark that we've received at least one frame (not orphaned)
+        if !hasBeenVisible {
+            hasBeenVisible = true
+            cancelOrphanDetection()  // Cancel the orphan timer since we're active
+        }
+        
         // FIRST CHECK: Have we explicitly stopped?
         guard !isStopped else {
             // Completely stopped - don't do anything
@@ -298,11 +314,51 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         return nil
     }
     
+    // MARK: - Orphan Detection
+    
+    /// Start a timer to detect if this instance was orphaned (created but never actually used)
+    private func startOrphanDetection() {
+        // Cancel any existing timer
+        cancelOrphanDetection()
+        
+        FileLogger.shared.info("ScreenSaver[\(instanceID)]: Starting orphan detection timer (2 seconds)")
+        
+        // Create a timer that fires after 2 seconds
+        orphanDetectionTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
+            
+            // If we get here and haven't received any animateOneFrame calls, we're orphaned
+            if !self.hasBeenVisible && !self.hasCleanedUp {
+                FileLogger.shared.logSeparator("ORPHANED INSTANCE DETECTED")
+                FileLogger.shared.warning("🚨 ScreenSaver[\(self.instanceID)]: Instance was created but never received animateOneFrame calls")
+                FileLogger.shared.warning("ScreenSaver[\(self.instanceID)]: hasBeenVisible=\(self.hasBeenVisible), hasStarted=\(self.hasStarted), hasCleanedUp=\(self.hasCleanedUp)")
+                FileLogger.shared.warning("ScreenSaver[\(self.instanceID)]: This is likely a system-created but abandoned instance")
+                FileLogger.shared.warning("ScreenSaver[\(self.instanceID)]: Forcing cleanup to prevent memory leak...")
+                
+                self.isStopped = true
+                self.performCleanup(reason: "orphaned-instance")
+                
+                FileLogger.shared.info("ScreenSaver[\(self.instanceID)]: Orphaned instance cleaned up")
+            }
+        }
+    }
+    
+    /// Cancel the orphan detection timer
+    private func cancelOrphanDetection() {
+        if let timer = orphanDetectionTimer {
+            timer.invalidate()
+            orphanDetectionTimer = nil
+        }
+    }
+    
     deinit {
+        // Cancel timer in case it's still running
+        cancelOrphanDetection()
+        
         FileLogger.shared.logLifecycle(
             object: "ScreenSaver[\(instanceID)]",
             event: "deinit",
-            details: "ScreenSaver being deallocated - hasCleanedUp=\(hasCleanedUp)"
+            details: "ScreenSaver being deallocated - hasCleanedUp=\(hasCleanedUp), hasBeenVisible=\(hasBeenVisible)"
         )
         
         // If we somehow got here without cleanup, force it now
@@ -318,4 +374,3 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         hostingView = nil
     }
 }
-#endif // os(macOS)

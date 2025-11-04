@@ -5,6 +5,6 @@
       location = "self:">
    </FileRef>
    <FileRef
-      location = "group:Logger.swift">
+      location = "group:ORPHAN_INSTANCE_FIX.md">
    </FileRef>
 </Workspace>
