@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 func HourHand(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
     clockSize: CGFloat,

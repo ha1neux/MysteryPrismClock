@@ -5,14 +5,6 @@
 //  Created by Bill Coderre on 11/4/25.
 //
 
-
-//
-//  MinuteHourOverlap.swift
-//  MysteryPrismClock
-//
-//  Created by Bill Coderre on 11/4/25.
-//
-
 import SwiftUI
 
 func MinuteHourOverlap(

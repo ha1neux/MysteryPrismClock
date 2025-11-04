@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct MinuteHandView: View {
     let timeComponents: (seconds: Double, minutes: Double, hours: Double)
     let clockSize: CGFloat

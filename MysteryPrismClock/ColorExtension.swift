@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Foundation
-import AppKit
 
 // Extensions for color manipulation
 extension Color {

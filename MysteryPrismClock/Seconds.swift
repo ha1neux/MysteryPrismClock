@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct SecondsDisk: View {
     let timeSeconds: Double
     let clockSize: CGFloat

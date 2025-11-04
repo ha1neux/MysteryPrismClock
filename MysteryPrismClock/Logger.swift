@@ -5,8 +5,6 @@
 //  Created on 11/02/25.
 //
 
-#if os(macOS)
-import Foundation
 import AppKit
 
 /// A simple logger that writes to a file in the Downloads folder
@@ -152,4 +150,3 @@ public extension FileLogger {
         log(message, level: .error)
     }
 }
-#endif // os(macOS)
