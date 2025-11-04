@@ -66,13 +66,11 @@ struct MysteryPrismClockView: View {
                 }
             }
             .onAppear {
-                // Check CapsLock on launch - if pressed, enable logging for entire session
+                // Logging state is already set by screensaver init, but check again as backup
+                FileLogger.shared.updateLoggingState()
                 let capsLockPressed = NSEvent.modifierFlags.contains(.capsLock)
-                if capsLockPressed {
-                    FileLogger.shared.enableLogging()
-                }
                 
-                // Log startup (will only log if CapsLock was pressed)
+                // Log startup (will only log if CapsLock is pressed)
                 FileLogger.shared.logSeparator("VIEW APPEARED")
                 FileLogger.shared.info("Clock view appeared - Screen size: \(geometry.size)")
                 FileLogger.shared.info("CapsLock on launch: \(capsLockPressed ? "PRESSED (logging enabled)" : "not pressed (logging disabled)")")

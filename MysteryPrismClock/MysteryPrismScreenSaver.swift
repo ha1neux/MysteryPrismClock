@@ -53,13 +53,17 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         instanceID = Self.instanceCounter
         super.init(frame: frame, isPreview: isPreview)
         
+        // Update logging state based on current CapsLock state
+        FileLogger.shared.updateLoggingState()
+        let capsLockPressed = NSEvent.modifierFlags.contains(.capsLock)
+        
         // Set animation time interval to 60 FPS
         animationTimeInterval = 1.0 / 60.0
         
         FileLogger.shared.logLifecycle(
             object: "ScreenSaver[\(instanceID)]",
             event: "init",
-            details: "isPreview=\(isPreview), frame=\(frame)"
+            details: "isPreview=\(isPreview), frame=\(frame), CapsLock=\(capsLockPressed ? "ENABLED" : "disabled")"
         )
         setupView()
     }
@@ -69,13 +73,17 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         instanceID = Self.instanceCounter
         super.init(coder: coder)
         
+        // Update logging state based on current CapsLock state
+        FileLogger.shared.updateLoggingState()
+        let capsLockPressed = NSEvent.modifierFlags.contains(.capsLock)
+        
         // Set animation time interval to 60 FPS
         animationTimeInterval = 1.0 / 60.0
         
         FileLogger.shared.logLifecycle(
             object: "ScreenSaver[\(instanceID)]",
             event: "init(coder)",
-            details: "Initialized from coder"
+            details: "Initialized from coder, CapsLock=\(capsLockPressed ? "ENABLED" : "disabled")"
         )
         setupView()
     }
@@ -109,6 +117,9 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     override func startAnimation() {
         super.startAnimation()
         hasStarted = true
+        
+        // Re-check Caps Lock state when animation starts (in case it changed since init)
+        FileLogger.shared.updateLoggingState()
         
         FileLogger.shared.logLifecycle(
             object: "ScreenSaver[\(instanceID)]",

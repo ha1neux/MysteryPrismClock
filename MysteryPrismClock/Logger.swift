@@ -7,6 +7,7 @@
 
 #if os(macOS)
 import Foundation
+import AppKit
 
 /// A simple logger that writes to a file in the Downloads folder
 public class FileLogger {
@@ -18,27 +19,47 @@ public class FileLogger {
         return formatter
     }()
     
-    private let fileURL: URL?
+    private var fileURL: URL?
     private var isLoggingEnabled = false
+    private var hasWrittenHeader = false
+    private var currentSessionFileURL: URL?
     
     private init() {
-        // For screensavers, use /tmp/ which is always accessible
-        let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let fileName = "MysteryPrismClock-\(timestamp).log"
-        let tmpURL = URL(fileURLWithPath: "/tmp/\(fileName)")
+        // Don't create file URL yet - wait until we know if logging is enabled
+    }
+    
+    /// Write the log file header (called lazily on first log message)
+    private func writeHeaderIfNeeded() {
+        guard !hasWrittenHeader, let fileURL = fileURL else { return }
+        hasWrittenHeader = true
         
         let header = "=== MysteryPrismClock Log ===\nStarted: \(Date())\n\n"
         do {
-            try header.write(to: tmpURL, atomically: true, encoding: .utf8)
-            fileURL = tmpURL
+            try header.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {
-            fileURL = nil
+            // Silently fail
         }
     }
     
-    /// Enable logging for the entire session (called on launch if CapsLock is down)
-    public func enableLogging() {
-        isLoggingEnabled = true
+    /// Set logging state based on current Caps Lock state (called on each screensaver launch)
+    public func updateLoggingState() {
+        let wasEnabled = isLoggingEnabled
+        isLoggingEnabled = NSEvent.modifierFlags.contains(.capsLock)
+        
+        // Only create a new file if we're transitioning from disabled to enabled
+        // or if we don't have a file yet and logging is enabled
+        if isLoggingEnabled && (!wasEnabled || fileURL == nil) {
+            // Create a new log file for this session
+            let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+            let fileName = "MysteryPrismClock-\(timestamp).log"
+            fileURL = URL(fileURLWithPath: "/tmp/\(fileName)")
+            hasWrittenHeader = false
+        } else if !isLoggingEnabled && wasEnabled {
+            // Transitioning from enabled to disabled - clear the file URL
+            fileURL = nil
+            hasWrittenHeader = false
+        }
+        // If already enabled and staying enabled, keep the same file
     }
     
     /// Check if logging is currently enabled
@@ -48,14 +69,19 @@ public class FileLogger {
     
     /// Log a message to the file
     public func log(_ message: String, level: LogLevel = .info) {
-        // Only log if logging was enabled at launch
+        // CRITICAL: Double-check that logging is enabled
+        // This prevents any stale log calls from writing to old files
         guard isLoggingEnabled else {
             return
         }
         
+        // CRITICAL: Ensure we have a valid file URL for THIS session
         guard let fileURL = fileURL else {
             return
         }
+        
+        // Write header on first log message
+        writeHeaderIfNeeded()
         
         let timestamp = dateFormatter.string(from: Date())
         let threadInfo = Thread.isMainThread ? "main" : "bg"
