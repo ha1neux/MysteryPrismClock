@@ -5,13 +5,9 @@
 //  Created by Bill Coderre on 10/18/25.
 //
 
-#if os(macOS)
 import SwiftUI
 import Foundation
 import AppKit
-
-// Ensure FileLogger and SharedTimerManager are available
-// These should be defined in Logger.swift and MysteryPrismScreenSaver.swift
 
 struct MysteryPrismClockView: View {
     @StateObject private var viewModel = ClockViewModel()
@@ -70,9 +66,16 @@ struct MysteryPrismClockView: View {
                 }
             }
             .onAppear {
-                // Log startup
+                // Check CapsLock on launch - if pressed, enable logging for entire session
+                let capsLockPressed = NSEvent.modifierFlags.contains(.capsLock)
+                if capsLockPressed {
+                    FileLogger.shared.enableLogging()
+                }
+                
+                // Log startup (will only log if CapsLock was pressed)
                 FileLogger.shared.logSeparator("VIEW APPEARED")
                 FileLogger.shared.info("Clock view appeared - Screen size: \(geometry.size)")
+                FileLogger.shared.info("CapsLock on launch: \(capsLockPressed ? "PRESSED (logging enabled)" : "not pressed (logging disabled)")")
                 
                 // Register this view model with the shared instance
                 SharedTimerManager.shared.currentViewModel = viewModel
@@ -630,8 +633,14 @@ class ClockViewModel: ObservableObject {
     private var frameCount: Int = 0
     private var isRunning = false
     
+    // Color transition properties
+    private var isTransitioningColor = false
+    private var colorTransitionStartTime: Date?
+    private var oldClockBaseColor = Color.random
+    private var targetClockBaseColor = Color.random
+    
     // Add a counter to detect if we're still being updated after stop
-    private var updateCount: Int = 0
+    var updateCount: Int = 0
     
     private let baseSpeed: CGFloat = 0.16
     private let inset: CGFloat = 0.8
@@ -651,13 +660,27 @@ class ClockViewModel: ObservableObject {
     
     // Called from the screensaver's animateOneFrame() method
     func performSingleUpdate() {
-        guard isRunning else { return }
+        guard isRunning else { 
+            // Not running anymore - clear ourselves from SharedTimerManager if we're still there
+            if SharedTimerManager.shared.currentViewModel === self {
+                FileLogger.shared.warning("ClockViewModel: performSingleUpdate called when not running - clearing SharedTimerManager")
+                SharedTimerManager.shared.currentViewModel = nil
+            }
+            return 
+        }
         
         updateCount += 1
         frameCount += 1
         let now = Date()
         
         let objectID = ObjectIdentifier(self).hashValue
+        
+        // Safety check: If we've been stopped for a while, something went wrong
+        if updateCount > 0 && !isRunning {
+            FileLogger.shared.error("ClockViewModel[\(objectID)]: DETECTED UPDATE AFTER STOP! This should not happen.")
+            stopUpdating()
+            return
+        }
         
         // Log every 120 frames (every 2 seconds at 60fps) to track activity
         if updateCount % 120 == 0 {
@@ -683,10 +706,29 @@ class ClockViewModel: ObservableObject {
             lastDirectionChange = now
         }
         
-        // Color change (every 30 seconds) - simple instant change
+        // Color change (every 30 seconds) - start transition
         if now.timeIntervalSince(lastColorChange) >= colorChangeInterval {
-            clockBaseColor = Color.random
+            startColorTransition()
             lastColorChange = now
+        }
+        
+        // Update color transition (only every 3 frames = ~20fps for smooth but efficient updates)
+        if isTransitioningColor && frameCount % 3 == 0 {
+            if let startTime = colorTransitionStartTime {
+                let elapsed = now.timeIntervalSince(startTime)
+                let progress = min(elapsed / colorTransitionDuration, 1.0)
+                
+                clockBaseColor = interpolateColor(
+                    from: oldClockBaseColor,
+                    to: targetClockBaseColor,
+                    progress: progress
+                )
+                
+                if progress >= 1.0 {
+                    isTransitioningColor = false
+                    colorTransitionStartTime = nil
+                }
+            }
         }
         
         // Debug info (every second, ~60 frames)
@@ -702,6 +744,11 @@ class ClockViewModel: ObservableObject {
         FileLogger.shared.logSeparator("STOP UPDATING")
         FileLogger.shared.info("ClockViewModel[\(objectID)]: stopUpdating called - will stop accepting animateOneFrame updates")
         isRunning = false
+        
+        // Stop any ongoing color transition
+        isTransitioningColor = false
+        colorTransitionStartTime = nil
+        
         FileLogger.shared.info("ClockViewModel[\(objectID)]: Stopped at updateCount=\(updateCount)")
     }
     
@@ -769,6 +816,42 @@ class ClockViewModel: ObservableObject {
         velocity = CGPoint(
             x: Foundation.cos(newAngle) * newSpeed,
             y: Foundation.sin(newAngle) * newSpeed
+        )
+    }
+    
+    private func startColorTransition() {
+        guard !isTransitioningColor else { return }
+        
+        oldClockBaseColor = clockBaseColor
+        targetClockBaseColor = Color.random
+        
+        isTransitioningColor = true
+        colorTransitionStartTime = Date()
+    }
+    
+    private func interpolateColor(from startColor: Color, to endColor: Color, progress: Double) -> Color {
+        let startHSB = startColor.hsb
+        let endHSB = endColor.hsb
+        
+        // Handle hue wrapping for shortest path
+        var hueDiff = endHSB.hue - startHSB.hue
+        if hueDiff > 0.5 {
+            hueDiff -= 1.0
+        } else if hueDiff < -0.5 {
+            hueDiff += 1.0
+        }
+        
+        var interpolatedHue = startHSB.hue + (hueDiff * progress)
+        if interpolatedHue < 0.0 { interpolatedHue += 1.0 }
+        if interpolatedHue > 1.0 { interpolatedHue -= 1.0 }
+        
+        let interpolatedSaturation = startHSB.saturation + (endHSB.saturation - startHSB.saturation) * progress
+        let interpolatedBrightness = startHSB.brightness + (endHSB.brightness - startHSB.brightness) * progress
+        
+        return Color(
+            hue: interpolatedHue,
+            saturation: interpolatedSaturation,
+            brightness: interpolatedBrightness
         )
     }
     
@@ -855,5 +938,3 @@ class TimerManager: ObservableObject {
 #Preview {
     MysteryPrismClockView()
 }
-
-#endif // os(macOS)

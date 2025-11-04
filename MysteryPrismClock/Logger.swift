@@ -19,6 +19,7 @@ public class FileLogger {
     }()
     
     private let fileURL: URL?
+    private var isLoggingEnabled = false
     
     private init() {
         // For screensavers, use /tmp/ which is always accessible
@@ -35,8 +36,23 @@ public class FileLogger {
         }
     }
     
+    /// Enable logging for the entire session (called on launch if CapsLock is down)
+    public func enableLogging() {
+        isLoggingEnabled = true
+    }
+    
+    /// Check if logging is currently enabled
+    public var loggingEnabled: Bool {
+        return isLoggingEnabled
+    }
+    
     /// Log a message to the file
     public func log(_ message: String, level: LogLevel = .info) {
+        // Only log if logging was enabled at launch
+        guard isLoggingEnabled else {
+            return
+        }
+        
         guard let fileURL = fileURL else {
             return
         }

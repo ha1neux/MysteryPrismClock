@@ -45,6 +45,8 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     private static var instanceCounter = 0
     private var hasStarted = false
     private var hasCleanedUp = false
+    private var isStopped = false  // Flag to prevent any updates after stop
+    private var hasBeenVisible = false  // Track if window has ever been visible
     
     override init?(frame: NSRect, isPreview: Bool) {
         Self.instanceCounter += 1
@@ -107,6 +109,7 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     override func startAnimation() {
         super.startAnimation()
         hasStarted = true
+        
         FileLogger.shared.logLifecycle(
             object: "ScreenSaver[\(instanceID)]",
             event: "startAnimation",
@@ -117,12 +120,15 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     override func stopAnimation() {
         super.stopAnimation()
         
+        // IMMEDIATELY set flag to stop all updates
+        isStopped = true
+        
         FileLogger.shared.logSeparator("SCREENSAVER DISMISSED BY USER")
-        FileLogger.shared.info("🛑 User dismissed the screensaver (mouse moved, key pressed, etc.)")
+        FileLogger.shared.info("🛑 User dismissed the screensaver (stopAnimation called)")
         FileLogger.shared.logLifecycle(
             object: "ScreenSaver[\(instanceID)]",
             event: "stopAnimation called",
-            details: "Thread: \(Thread.isMainThread ? "main" : "background")"
+            details: "Thread: \(Thread.isMainThread ? "main" : "background"), isStopped=\(isStopped)"
         )
         
         performCleanup(reason: "stopAnimation")
@@ -201,28 +207,71 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         }
     }
     
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        
+        if window == nil {
+            // View was removed from window - screen saver dismissed
+            FileLogger.shared.info("ScreenSaver[\(instanceID)]: viewDidMoveToWindow called with nil window - dismissed")
+            if !isStopped && !hasCleanedUp {
+                isStopped = true
+                performCleanup(reason: "viewDidMoveToWindow-nil")
+            }
+        } else {
+            FileLogger.shared.info("ScreenSaver[\(instanceID)]: viewDidMoveToWindow called with window: \(window!)")
+        }
+    }
+    
     override func animateOneFrame() {
         // This is called by the system at the interval specified in animationTimeInterval
         
-        // Check if we should still be running
-        // If the window is nil or not visible, we've been dismissed
-        if window == nil || window?.isVisible == false {
-            if !hasCleanedUp {
-                FileLogger.shared.info("ScreenSaver[\(instanceID)]: Detected dismissal in animateOneFrame (window nil or not visible)")
-                performCleanup(reason: "window-dismissed")
-            }
+        // FIRST CHECK: Have we explicitly stopped?
+        guard !isStopped else {
+            // Completely stopped - don't do anything
             return
         }
         
-        // Only update if we haven't cleaned up yet
+        // SECOND CHECK: Have we cleaned up?
         guard !hasCleanedUp else {
-            // Don't update after cleanup - log occasionally to verify we stopped
+            // Don't update after cleanup
             return 
         }
         
-        // Tell the view model to update once
+        // THIRD CHECK: Are we hidden? (but only check for NON-preview instances)
+        // Preview instances can be hidden when the full-screen saver starts, which is normal
+        if !isPreview && (isHidden || isHiddenOrHasHiddenAncestor) {
+            FileLogger.shared.info("ScreenSaver[\(instanceID)]: View is hidden - dismissed")
+            isStopped = true
+            performCleanup(reason: "view-hidden")
+            return
+        }
+        
+        // FOURTH CHECK: Detect dismissal by window level change
+        // Screen savers use window level -2147483625, normal windows use 0
+        // When dismissed, the window level changes to 0 even though nothing else changes
+        if let win = window {
+            if !isPreview && win.level.rawValue == 0 {
+                FileLogger.shared.info("ScreenSaver[\(instanceID)]: Window level changed to 0 (normal window level) - dismissed")
+                isStopped = true
+                performCleanup(reason: "window-level-changed")
+                return
+            }
+            
+            // Log window state periodically for debugging
+            if let vm = SharedTimerManager.shared.currentViewModel, vm.updateCount % 120 == 0 {
+                FileLogger.shared.info("ScreenSaver[\(instanceID)]: Window state - isVisible:\(win.isVisible), alpha:\(win.alphaValue), level:\(win.level.rawValue), isOnScreen:\(win.isOnActiveSpace), viewHidden:\(isHidden), isPreview:\(isPreview)")
+            }
+        }
+        
+        // Update the view model ONLY if it belongs to this instance
         if let vm = SharedTimerManager.shared.currentViewModel {
-            vm.performSingleUpdate()
+            // Only update if this is OUR view model
+            if vm === viewModel {
+                vm.performSingleUpdate()
+            } else {
+                // This can happen during transitions between preview and full-screen
+                FileLogger.shared.info("ScreenSaver[\(instanceID)]: SharedTimerManager has a different viewModel - skipping update")
+            }
         }
     }
     
