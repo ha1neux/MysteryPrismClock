@@ -12,16 +12,6 @@ import SwiftUI
 public class SharedTimerManager {
     public static let shared = SharedTimerManager()
     
-    weak var currentTimerManager: TimerManager? {
-        didSet {
-            if currentTimerManager != nil {
-                FileLogger.shared.info("SharedTimerManager: currentTimerManager SET (not nil)")
-            } else {
-                FileLogger.shared.info("SharedTimerManager: currentTimerManager CLEARED (nil)")
-            }
-        }
-    }
-    
     weak var currentViewModel: ClockViewModel? {
         didSet {
             if let vm = currentViewModel {
@@ -179,7 +169,6 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         let viewModelID = viewModel.map { ObjectIdentifier($0).hashValue }
         
         SharedTimerManager.shared.currentViewModel = nil
-        SharedTimerManager.shared.currentTimerManager = nil
         
         FileLogger.shared.info("ScreenSaver[\(instanceID)]: Cleared SharedTimerManager references (viewModel was \(viewModelID.map { String($0) } ?? "nil"))")
         
@@ -369,7 +358,6 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         
         SharedTimerManager.shared.currentViewModel?.stopUpdating()
         SharedTimerManager.shared.currentViewModel = nil
-        SharedTimerManager.shared.currentTimerManager = nil
         hostingView?.removeFromSuperview()
         hostingView = nil
     }
