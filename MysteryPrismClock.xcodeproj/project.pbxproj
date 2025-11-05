@@ -10,6 +10,18 @@
 		446057FC2EB3F7F200F38C51 /* notarize_saver.sh in Resources */ = {isa = PBXBuildFile; fileRef = 446057FB2EB3F7F200F38C51 /* notarize_saver.sh */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		44DC3D6F2EBBAFB6000B179E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "(HOME)/Library/Screen Savers";
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		446057FB2EB3F7F200F38C51 /* notarize_saver.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = notarize_saver.sh; sourceTree = "<group>"; };
@@ -70,6 +82,7 @@
 				44483AC72EA452BD00F49641 /* Sources */,
 				44483AC82EA452BD00F49641 /* Frameworks */,
 				44483AC92EA452BD00F49641 /* Resources */,
+				44DC3D6F2EBBAFB6000B179E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -275,7 +288,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = MysteryPrismClock/MysteryPrism.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Bill Coderre (RUHYK57MF9)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -305,8 +319,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = MysteryPrismClock/MysteryPrism.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application: Bill Coderre (RUHYK57MF9)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
