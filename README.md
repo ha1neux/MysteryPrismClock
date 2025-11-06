@@ -34,4 +34,4 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 MIT License.
 
 ## Author
-Created by Bill Coderre in October 2025.
+Created by Bill Coderre in October/November 2025.
