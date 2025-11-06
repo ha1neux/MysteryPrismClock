@@ -10,7 +10,7 @@
 		44DC3D6F2EBBAFB6000B179E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "(HOME)/Library/Screen Savers";
+			dstPath = "";
 			dstSubfolderSpec = 0;
 			files = (
 			);
@@ -24,8 +24,18 @@
 		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		44ABBEB52EBC6D30004C7FD0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 44483ACA2EA452BD00F49641 /* MysteryPrismClock */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		44483ACD2EA452BD00F49641 /* MysteryPrismClock */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MysteryPrismClock; sourceTree = "<group>"; };
+		44483ACD2EA452BD00F49641 /* MysteryPrismClock */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (44ABBEB52EBC6D30004C7FD0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MysteryPrismClock; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,7 +167,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "    echo \"📈 Auto-incrementing build number...\"\n    \n    # Increment the build number\n    xcrun agvtool next-version -all\n    \n    # Get the new build number\n    BUILD_NUMBER=$(xcrun agvtool what-version -terse)\n    \n    echo \"✅ Build number incremented to: ${BUILD_NUMBER}\"\n\n";
+			shellScript = "#!/bin/bash\n\n# Auto-increment build number using PlistBuddy\n# Add this as a Run Script Phase in Xcode build phases (before \"Copy Bundle Resources\")\n\nset -e\n\n# Path to Info.plist in source directory\nINFO_PLIST=\"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n\n# Verify the Info.plist exists\nif [ ! -f \"${INFO_PLIST}\" ]; then\n    echo \"error: Info.plist not found at ${INFO_PLIST}\"\n    exit 1\nfi\n\necho \"📝 Incrementing build number in ${INFOPLIST_FILE}\"\n\n# Get the current build number\nCURRENT_BUILD=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFO_PLIST}\" 2>/dev/null || echo \"0\")\n\n# Increment it\nNEW_BUILD=$((CURRENT_BUILD + 1))\n\n# Update the Info.plist\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${NEW_BUILD}\" \"${INFO_PLIST}\"\n\n# Also ensure CFBundleShortVersionString exists (marketing version)\nVERSION=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${INFO_PLIST}\" 2>/dev/null || echo \"\")\n\nif [ -z \"${VERSION}\" ]; then\n    echo \"⚠️  CFBundleShortVersionString not found, setting to 1.0\"\n    /usr/libexec/PlistBuddy -c \"Add :CFBundleShortVersionString string 1.0\" \"${INFO_PLIST}\" 2>/dev/null || \\\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString 1.0\" \"${INFO_PLIST}\"\nfi\n\necho \"✅ Build number incremented: ${CURRENT_BUILD} → ${NEW_BUILD}\"\necho \"   Version: ${VERSION} (${NEW_BUILD})\"\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -214,7 +224,7 @@
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -282,7 +292,7 @@
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -311,10 +321,10 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 60;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = RUHYK57MF9;
-				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MysteryPrismClock/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
@@ -329,6 +339,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 				WRAPPER_EXTENSION = saver;
 			};
 			name = Debug;
@@ -342,10 +353,10 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application: Bill Coderre (RUHYK57MF9)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 60;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = RUHYK57MF9;
-				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MysteryPrismClock/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
@@ -359,6 +370,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 				WRAPPER_EXTENSION = saver;
 			};
 			name = Release;

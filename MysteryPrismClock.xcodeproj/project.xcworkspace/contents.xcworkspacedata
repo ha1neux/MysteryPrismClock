@@ -5,6 +5,9 @@
       location = "self:">
    </FileRef>
    <FileRef
-      location = "group:ORPHAN_INSTANCE_FIX.md">
+      location = "group:check_version_settings.sh">
+   </FileRef>
+   <FileRef
+      location = "group:increment_build.sh">
    </FileRef>
 </Workspace>
