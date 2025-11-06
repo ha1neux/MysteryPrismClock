@@ -75,6 +75,7 @@
 			buildConfigurationList = 44483AD42EA452BD00F49641 /* Build configuration list for PBXNativeTarget "MysteryPrismClock" */;
 			buildPhases = (
 				44483AC62EA452BD00F49641 /* Headers */,
+				449CDCA32EBC5DD5003E91C7 /* Auto-Increment Build number */,
 				44483AC72EA452BD00F49641 /* Sources */,
 				44483AC82EA452BD00F49641 /* Frameworks */,
 				44483AC92EA452BD00F49641 /* Resources */,
@@ -137,6 +138,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		449CDCA32EBC5DD5003E91C7 /* Auto-Increment Build number */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Auto-Increment Build number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "    echo \"📈 Auto-incrementing build number...\"\n    \n    # Increment the build number\n    xcrun agvtool next-version -all\n    \n    # Get the new build number\n    BUILD_NUMBER=$(xcrun agvtool what-version -terse)\n    \n    echo \"✅ Build number incremented to: ${BUILD_NUMBER}\"\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		44483AC72EA452BD00F49641 /* Sources */ = {
