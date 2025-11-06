@@ -90,6 +90,7 @@
 				44483AC82EA452BD00F49641 /* Frameworks */,
 				44483AC92EA452BD00F49641 /* Resources */,
 				44DC3D6F2EBBAFB6000B179E /* CopyFiles */,
+				44717BFC2EBC709600BA018D /* Install and Restart ScreenSaver */,
 			);
 			buildRules = (
 			);
@@ -150,6 +151,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		44717BFC2EBC709600BA018D /* Install and Restart ScreenSaver */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Install and Restart ScreenSaver";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n\n# Exit on error\nset -e\n\n\necho -e \"🔧 Post-Build: Installing and Restarting Screensaver\"\n\n# Get the built product path\nBUILT_PRODUCT_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\n\necho -e \"📦 Built product: ${BUILT_PRODUCT_PATH}\"\n\n# Verify the build exists\nif [ ! -d \"${BUILT_PRODUCT_PATH}\" ]; then\n    echo -e \"❌ Error: Built product not found at ${BUILT_PRODUCT_PATH}\"\n    exit 1\nfi\n\n# Define installation directory (user screensavers)\nINSTALL_DIR=\"${HOME}/Library/Screen Savers\"\nINSTALLED_SAVER=\"${INSTALL_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\n\necho -e \"📍 Installation directory: ${INSTALL_DIR}\"\n\n# Create the directory if it doesn't exist\nmkdir -p \"${INSTALL_DIR}\"\n\n# Kill all running screensaver processes\necho -e \"🛑 Killing all screensaver processes...\"\n\n# Kill the System Preferences/Settings process if it's open (to release file locks)\npkill -x \"System Preferences\" 2>/dev/null || true\npkill -x \"System Settings\" 2>/dev/null || true\n\n# Kill the legacyScreenSaver process (this is what actually runs screensavers)\npkill -x \"legacyScreenSaver\" 2>/dev/null || true\n\n# Kill the ScreenSaverEngine process\npkill -x \"ScreenSaverEngine\" 2>/dev/null || true\n\n# Kill any process that might have loaded our specific screensaver\n# This uses the product name to be more specific\npkill -f \"${PRODUCT_NAME}\" 2>/dev/null || true\n\n# Wait a moment for processes to fully terminate\nsleep 0.5\n\necho -e \"✅ All screensaver processes terminated\"\n\n# Remove old installation if it exists\nif [ -d \"${INSTALLED_SAVER}\" ]; then\n    echo -e \"🗑️  Removing old installation...\"\n    rm -rf \"${INSTALLED_SAVER}\"\nfi\n\n# Copy the new build to the installation directory\necho -e \"📥 Installing screensaver...\"\ncp -R \"${BUILT_PRODUCT_PATH}\" \"${INSTALLED_SAVER}\"\n\n# Verify installation\nif [ -d \"${INSTALLED_SAVER}\" ]; then\n    echo -e \"✅ Screensaver installed successfully!\"\n    echo -e \"📁 Location: ${INSTALLED_SAVER}\"\nelse\n    echo -e \"❌ Installation failed\"\n    exit 1\nfi\n\n# Touch the screensaver to update its modification date\n# This can help the system recognize it's been updated\ntouch \"${INSTALLED_SAVER}\"\n\n# Optional: Refresh the screensaver list cache\n# This kills the preferences cache to force a refresh\ndefaults read com.apple.screensaver > /dev/null 2>&1 || true\n\necho -e \"🎉 Build installed and ready to use!\"\necho -e \"ℹ️  You can now test the screensaver without rebooting\"\n\nexit 0\n";
+		};
 		449CDCA32EBC5DD5003E91C7 /* Auto-Increment Build number */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
