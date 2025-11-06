@@ -273,7 +273,13 @@ class ClockViewModel: ObservableObject {
         
         let clockRadius = clockSize * inset / 2
         
+        // Get version information from the screen saver bundle (not Bundle.main which is the screen saver engine)
+        let bundle = Bundle(for: type(of: self))
+        let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
+        
         debugInfo = """
+        Version: \(version) (\(build))
         Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
         Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
         Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))
