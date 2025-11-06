@@ -24,7 +24,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - **Platform**: macOS
 - **Framework**: ScreenSaver, SwiftUI
 - **Language**: Swift
-- **Minimum Version**: macOS 15.6
+- **Minimum Supported OS Version**: macOS 15.6
 
 ## Code Structure
 - `MysteryPrismScreenSaver.swift`: Main screen saver class that hosts the SwiftUI view
@@ -35,3 +35,6 @@ MIT License.
 
 ## Author
 Created by Bill Coderre in October/November 2025.
+
+## Wish for Xcode/Claude enhancemeent
+Claude cannot "see" (whatever that means) projects' `.pbxproj` files. This is a sadness. I am sure it is planned for a future release.
