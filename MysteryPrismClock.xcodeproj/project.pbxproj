@@ -6,10 +6,6 @@
 	objectVersion = 70;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		446057FC2EB3F7F200F38C51 /* notarize_saver.sh in Resources */ = {isa = PBXBuildFile; fileRef = 446057FB2EB3F7F200F38C51 /* notarize_saver.sh */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		44DC3D6F2EBBAFB6000B179E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -137,7 +133,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				446057FC2EB3F7F200F38C51 /* notarize_saver.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +288,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 52;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = RUHYK57MF9;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -324,7 +319,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application: Bill Coderre (RUHYK57MF9)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 52;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = RUHYK57MF9;
 				GENERATE_INFOPLIST_FILE = YES;
