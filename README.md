@@ -11,6 +11,8 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - **Background Changes**: Clock background changes smoothly every 30 seconds.
 - **Moving Clock**: The clock slowly wanders around the screen
 - **SwiftUI Implementation**: Built using modern SwiftUI within a ScreenSaver framework
+- **Auto installation/restart screensaver engine script**: No more restarting to see changes!
+- **Auto Sign, Notarize, Stamp, and Zip release builds**: Requires you to make changes to the codesigning entities, and get a certificate from Apple and install it in your keychain (ask Claude for help with this), but once it's set up, it does all the dirty work for you, so you can send it to your friends.
 
 ## Build/Installation
 1. Clone this repository
