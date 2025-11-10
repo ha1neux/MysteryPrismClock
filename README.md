@@ -34,7 +34,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - Code has been refactored to lots of small files for separate functionality such as `Color` calculations and the various segments of the clock to be drawn.
 
 ## License
-MIT License.
+MIT License. Please feel free to re-use the code for your own projects. Please feel free to install the saver on your Mac and enjoy it. Please do not sell the existing screensaver or put it in a product as-is without asking. Thank you.
 
 ## Author
 Created by Bill Coderre in October/November 2025.
