@@ -31,6 +31,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 ## Code Structure
 - `MysteryPrismScreenSaver.swift`: Main screen saver class that hosts the SwiftUI view
 - `MysteryPrismClockView.swift`: SwiftUI implementation of the animated clock
+- Code has been refactored to lots of small files for separate functionality such as `Color` calculations and the various segments of the clock to be drawn.
 
 ## License
 MIT License.
