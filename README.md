@@ -16,7 +16,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 
 ## Build/Installation
 1. Clone this repository
-2. Open the project in Xcode
+2. Open the project in Xcode, adjust code signing credentials
 3. Build the screen saver target
 4. Press CapsLock for debug window and log
 5. Trigger screensaver.
@@ -34,10 +34,10 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - Code has been refactored to lots of small files for separate functionality such as `Color` calculations and the various segments of the clock to be drawn.
 
 ## License
-MIT License. Please feel free to re-use the code for your own projects. Please feel free to install the saver on your Mac and enjoy it. Please do not sell the existing screensaver or put it in a product as-is without asking. Thank you.
+MIT License. Please feel free to re-use the code for your own projects. Please feel free to install the saver on your Mac and enjoy it. **Please do not sell the existing screensaver or put it in a product as-is without asking. Thank you.**
 
 ## Author
 Created by Bill Coderre in October/November 2025.
 
-## Wish for Xcode/Claude enhancemeent
-Claude cannot "see" (whatever that means) projects' `.pbxproj` files. This is a sadness. I am sure it is planned for a future release.
+## Wish for Xcode/Claude enhancement
+Claude cannot "see" (whatever that means) projects' `.xcodeproj` files. This is a sadness.
