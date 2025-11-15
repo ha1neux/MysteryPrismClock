@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 class ClockViewModel: ObservableObject {
     @Published var currentTime = Date()
@@ -30,7 +31,8 @@ class ClockViewModel: ObservableObject {
     
     // Add a counter to detect if we're still being updated after stop
     var updateCount: Int = 0
-    
+
+    // Base constants
     private let baseSpeed: CGFloat = 0.16
     private let inset: CGFloat = 0.8
     private let clockSizeFactor: CGFloat = 2.0
@@ -151,9 +153,10 @@ class ClockViewModel: ObservableObject {
     
     private func setupInitialVelocity() {
         let angle = Double.random(in: 0...(2 * .pi))
+        let speed = baseSpeed
         velocity = CGPoint(
-            x: Foundation.cos(angle) * baseSpeed,
-            y: Foundation.sin(angle) * baseSpeed
+            x: Foundation.cos(angle) * speed,
+            y: Foundation.sin(angle) * speed
         )
     }
     
@@ -164,10 +167,10 @@ class ClockViewModel: ObservableObject {
     
     private func updateClockPosition() {
         guard screenSize != .zero else { return }
-        
+
         let clockSize = calculateClockSize(for: screenSize)
         let margin = clockSize / 2
-        
+
         var newPosition = CGPoint(
             x: clockPosition.x + velocity.x,
             y: clockPosition.y + velocity.y
@@ -199,7 +202,7 @@ class ClockViewModel: ObservableObject {
         let newAngle = currentAngle + angleChange
         let speedVariation = CGFloat.random(in: 0.5...1.5)
         let newSpeed = baseSpeed * speedVariation
-        
+
         velocity = CGPoint(
             x: Foundation.cos(newAngle) * newSpeed,
             y: Foundation.sin(newAngle) * newSpeed
@@ -216,25 +219,63 @@ class ClockViewModel: ObservableObject {
         colorTransitionStartTime = Date()
     }
     
+    /// Smoothly interpolates between two colors in HSB color space
+    ///
+    /// This function performs linear interpolation (lerp) for saturation and brightness,
+    /// but uses special logic for hue to ensure the shortest path around the color wheel.
+    ///
+    /// Color Wheel Wrapping Logic:
+    /// The hue component represents a circular color wheel (0.0 to 1.0, wrapping around).
+    /// When transitioning from one hue to another, there are two possible paths:
+    /// - Clockwise path
+    /// - Counter-clockwise path
+    ///
+    /// This function chooses the shorter path to create more natural color transitions.
+    ///
+    /// Example:
+    /// - From hue 0.1 (red) to 0.9 (purple):
+    ///   - Direct path: 0.1 -> 0.9 (distance = 0.8, goes through green/blue)
+    ///   - Wrapped path: 0.1 -> 0.0 -> 1.0 -> 0.9 (distance = 0.2, stays in red/purple range)
+    ///   - We choose the wrapped path (shorter)
+    ///
+    /// - Parameters:
+    ///   - startColor: The initial color
+    ///   - endColor: The target color
+    ///   - progress: Interpolation progress from 0.0 (startColor) to 1.0 (endColor)
+    /// - Returns: Interpolated color at the given progress
     private func interpolateColor(from startColor: Color, to endColor: Color, progress: Double) -> Color {
         let startHSB = startColor.hsb
         let endHSB = endColor.hsb
-        
-        // Handle hue wrapping for shortest path
+
+        // HUE INTERPOLATION with shortest path wrapping
+        // Calculate the hue difference (range: -1.0 to 1.0)
         var hueDiff = endHSB.hue - startHSB.hue
+
+        // Adjust for shortest path around the color wheel
+        // If difference > 0.5 (more than halfway), wrap backwards (counter-clockwise)
+        // Example: 0.9 - 0.1 = 0.8 -> adjust to 0.8 - 1.0 = -0.2 (go backwards instead)
         if hueDiff > 0.5 {
             hueDiff -= 1.0
-        } else if hueDiff < -0.5 {
+        }
+        // If difference < -0.5 (more than halfway backwards), wrap forwards (clockwise)
+        // Example: 0.1 - 0.9 = -0.8 -> adjust to -0.8 + 1.0 = 0.2 (go forwards instead)
+        else if hueDiff < -0.5 {
             hueDiff += 1.0
         }
-        
+
+        // Linear interpolation: start + (difference × progress)
+        // Example: start=0.1, diff=-0.2, progress=0.5 -> 0.1 + (-0.1) = 0.0
         var interpolatedHue = startHSB.hue + (hueDiff * progress)
+
+        // Normalize hue to [0.0, 1.0] range
         if interpolatedHue < 0.0 { interpolatedHue += 1.0 }
         if interpolatedHue > 1.0 { interpolatedHue -= 1.0 }
-        
+
+        // SATURATION AND BRIGHTNESS: Simple linear interpolation
+        // Formula: start + (end - start) × progress
         let interpolatedSaturation = startHSB.saturation + (endHSB.saturation - startHSB.saturation) * progress
         let interpolatedBrightness = startHSB.brightness + (endHSB.brightness - startHSB.brightness) * progress
-        
+
         return Color(
             hue: interpolatedHue,
             saturation: interpolatedSaturation,

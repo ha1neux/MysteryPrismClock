@@ -298,7 +298,7 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     override var hasConfigureSheet: Bool {
         return false
     }
-    
+
     override var configureSheet: NSWindow? {
         return nil
     }

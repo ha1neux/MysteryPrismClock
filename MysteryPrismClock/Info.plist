@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5f1</string>
+	<string>1.6f2</string>
 	<key>CFBundleVersion</key>
-	<string>75</string>
+	<string>100</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2025 Bill Coderre. All rights reserved.</string>
 	<key>NSPrincipalClass</key>

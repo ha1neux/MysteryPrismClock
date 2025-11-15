@@ -6,6 +6,16 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		440DF4172EC9341C00D9FE4F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 44483AC22EA452BD00F49641 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 44483ACA2EA452BD00F49641;
+			remoteInfo = MysteryPrismClock;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		44DC3D6F2EBBAFB6000B179E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -19,11 +29,32 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		440DF4042EC9330000D9FE4F /* MysteryPrismClockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrismClockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		440DF41E2EC9345900D9FE4F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ClockColors.swift,
+				ClockPaths.swift,
+				ClockView.swift,
+				ClockViewModel.swift,
+				ColorExtension.swift,
+				Hours.swift,
+				Logger.swift,
+				MinuteHourOverlap.swift,
+				MinuteHourSecondsOverlap.swift,
+				Minutes.swift,
+				MysteryPrismClockView.swift,
+				MysteryPrismScreenSaver.swift,
+				"Orphan Detection.swift",
+				Seconds.swift,
+			);
+			target = 440DF4032EC9330000D9FE4F /* MysteryPrismClockTests */;
+		};
 		44ABBEB52EBC6D30004C7FD0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -34,10 +65,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		44483ACD2EA452BD00F49641 /* MysteryPrismClock */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (44ABBEB52EBC6D30004C7FD0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MysteryPrismClock; sourceTree = "<group>"; };
+		440DF4052EC9330000D9FE4F /* MysteryPrismClockTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MysteryPrismClockTests; sourceTree = "<group>"; };
+		44483ACD2EA452BD00F49641 /* MysteryPrismClock */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (44ABBEB52EBC6D30004C7FD0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 440DF41E2EC9345900D9FE4F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MysteryPrismClock; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		440DF4012EC9330000D9FE4F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		44483AC82EA452BD00F49641 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -53,6 +92,7 @@
 			children = (
 				44A6FDC22EA4930F006854BE /* .gitignore */,
 				44483ACD2EA452BD00F49641 /* MysteryPrismClock */,
+				440DF4052EC9330000D9FE4F /* MysteryPrismClockTests */,
 				44483ACC2EA452BD00F49641 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				44483ACB2EA452BD00F49641 /* MysteryPrism.saver */,
+				440DF4042EC9330000D9FE4F /* MysteryPrismClockTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,6 +119,29 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		440DF4032EC9330000D9FE4F /* MysteryPrismClockTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 440DF40A2EC9330000D9FE4F /* Build configuration list for PBXNativeTarget "MysteryPrismClockTests" */;
+			buildPhases = (
+				440DF4002EC9330000D9FE4F /* Sources */,
+				440DF4012EC9330000D9FE4F /* Frameworks */,
+				440DF4022EC9330000D9FE4F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				440DF4182EC9341C00D9FE4F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				440DF4052EC9330000D9FE4F /* MysteryPrismClockTests */,
+			);
+			name = MysteryPrismClockTests;
+			packageProductDependencies = (
+			);
+			productName = MysteryPrismClockTests;
+			productReference = 440DF4042EC9330000D9FE4F /* MysteryPrismClockTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		44483ACA2EA452BD00F49641 /* MysteryPrismClock */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 44483AD42EA452BD00F49641 /* Build configuration list for PBXNativeTarget "MysteryPrismClock" */;
@@ -112,8 +176,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					440DF4032EC9330000D9FE4F = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 					44483ACA2EA452BD00F49641 = {
 						CreatedOnToolsVersion = 26.0.1;
 						LastSwiftMigration = 2600;
@@ -135,11 +203,19 @@
 			projectRoot = "";
 			targets = (
 				44483ACA2EA452BD00F49641 /* MysteryPrismClock */,
+				440DF4032EC9330000D9FE4F /* MysteryPrismClockTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		440DF4022EC9330000D9FE4F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		44483AC92EA452BD00F49641 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -167,7 +243,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\n# Exit on error\nset -e\n\necho -e \"🔧 Post-Build: Installing and Restarting Screensaver\"\n\n# Get the built product path\nBUILT_PRODUCT_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\n\necho -e \"📦 Built product: ${BUILT_PRODUCT_PATH}\"\n\n# Verify the build exists\nif [ ! -d \"${BUILT_PRODUCT_PATH}\" ]; then\n    echo -e \"❌ Error: Built product not found at ${BUILT_PRODUCT_PATH}\"\n    exit 1\nfi\n\n# Define installation directory (user screensavers)\nINSTALL_DIR=\"${HOME}/Library/Screen Savers\"\nINSTALLED_SAVER=\"${INSTALL_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\n\necho -e \"📍 Installation directory: ${INSTALL_DIR}\"\n\n# Create the directory if it doesn't exist\nmkdir -p \"${INSTALL_DIR}\"\n\n# Kill all running screensaver processes\necho -e \"🛑 Killing all screensaver processes...\"\n\n# Kill the System Preferences/Settings process if it's open (to release file locks)\npkill -x \"System Preferences\" 2>/dev/null || true\npkill -x \"System Settings\" 2>/dev/null || true\n\n# Kill the legacyScreenSaver process (this is what actually runs screensavers)\npkill -x \"legacyScreenSaver\" 2>/dev/null || true\n\n# Kill the ScreenSaverEngine process\npkill -x \"ScreenSaverEngine\" 2>/dev/null || true\n\n# Kill any process that might have loaded our specific screensaver\n# This uses the product name to be more specific\npkill -f \"${PRODUCT_NAME}\" 2>/dev/null || true\n\n# Wait a moment for processes to fully terminate\nsleep 0.5\n\necho -e \"✅ All screensaver processes terminated\"\n\n# Remove old installation if it exists\nif [ -d \"${INSTALLED_SAVER}\" ]; then\n    echo -e \"🗑️  Removing old installation...\"\n    rm -rf \"${INSTALLED_SAVER}\"\nfi\n\n# Copy the new build to the installation directory\necho -e \"📥 Installing screensaver...\"\ncp -R \"${BUILT_PRODUCT_PATH}\" \"${INSTALLED_SAVER}\"\n\n# Verify installation\nif [ -d \"${INSTALLED_SAVER}\" ]; then\n    echo -e \"✅ Screensaver installed successfully!\"\n    echo -e \"📁 Location: ${INSTALLED_SAVER}\"\nelse\n    echo -e \"❌ Installation failed\"\n    exit 1\nfi\n\n# Touch the screensaver to update its modification date\n# This can help the system recognize it's been updated\ntouch \"${INSTALLED_SAVER}\"\n\n# Optional: Refresh the screensaver list cache\n# This kills the preferences cache to force a refresh\ndefaults read com.apple.screensaver > /dev/null 2>&1 || true\n\necho -e \"🎉 Screensaver installed and ready to use!\"\n\nexit 0\n";
+			shellScript = "\"${PROJECT_DIR}/Scripts/install-and-restart.sh\"\n";
 		};
 		44717C5A2EBCDCFC00BA018D /* Sign, Notarize, Staple, and make a zip file (release builds only) */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -186,7 +262,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "##!/bin/bash\n\nset -e\n\n# Only run for Release builds\nif [ \"${CONFIGURATION}\" != \"Release\" ]; then\n    echo \"ℹ️  Skipping notarization (not a Release build, current configuration: ${CONFIGURATION})\"\n    exit 0\nfi\n\n# Configuration - UPDATE THESE VALUES\nDEVELOPER_ID=\"Developer ID Application: Bill Coderre (RUHYK57MF9)\"\nNOTARIZATION_KEYCHAIN_PROFILE=\"notarization-profile\"\n\n# Find the most recent build\nDERIVED_DATA_PATH=\"$HOME/Library/Developer/Xcode/DerivedData\"\nPROJECT_BUILD_PATH=$(find \"${DERIVED_DATA_PATH}\" -name \"MysteryPrismClock-*\" -type d | head -1)\n\nif [ -z \"${PROJECT_BUILD_PATH}\" ]; then\n    echo \"❌ Could not find DerivedData path for MysteryPrismClock\"\n    exit 1\nfi\n\nBUNDLE_PATH=\"${PROJECT_BUILD_PATH}/Build/Products/Release/MysteryPrism.saver\"\n\necho \"🔍 Starting signing, notarization, and stapling...\"\necho \"Bundle path: ${BUNDLE_PATH}\"\n\n# Verify bundle exists\nif [ ! -d \"${BUNDLE_PATH}\" ]; then\n    echo \"❌ Bundle not found at ${BUNDLE_PATH}\"\n    echo \"Available builds:\"\n    find \"${PROJECT_BUILD_PATH}/Build/Products\" -name \"*.saver\" 2>/dev/null || echo \"No .saver bundles found\"\n    exit 1\nfi\n\n# Check current signature\necho \"🔍 Current signature status:\"\ncodesign -dv \"${BUNDLE_PATH}\" 2>&1\n\n# Step 1: Sign for distribution\necho \"✍️  Signing bundle for distribution...\"\ncodesign --force \\\n         --verify \\\n         --verbose \\\n         --sign \"${DEVELOPER_ID}\" \\\n         --options runtime \\\n         --timestamp \\\n         \"${BUNDLE_PATH}\"\n\nif [ $? -ne 0 ]; then\n    echo \"❌ Code signing failed\"\n    exit 1\nfi\n\necho \"✅ Bundle signed successfully\"\n\n# Step 2: Create a zip for notarization\nBUNDLE_DIR=\"$(dirname \"${BUNDLE_PATH}\")\"\nBUNDLE_NAME=\"$(basename \"${BUNDLE_PATH}\" .saver)\"\nZIP_PATH=\"${BUNDLE_DIR}/${BUNDLE_NAME}.zip\"\n\necho \"📦 Creating zip for notarization...\"\ncd \"${BUNDLE_DIR}\"\nrm -f \"${BUNDLE_NAME}.zip\"\n/usr/bin/ditto -c -k --keepParent \"${BUNDLE_NAME}.saver\" \"${BUNDLE_NAME}.zip\"\n\nif [ ! -f \"${ZIP_PATH}\" ]; then\n    echo \"❌ Failed to create zip file\"\n    exit 1\nfi\n\necho \"✅ Zip created at ${ZIP_PATH}\"\n\n# Step 3: Submit for notarization\necho \"🚀 Submitting for notarization...\"\nxcrun notarytool submit \"${ZIP_PATH}\" \\\n                       --keychain-profile \"${NOTARIZATION_KEYCHAIN_PROFILE}\" \\\n                       --wait\n\nif [ $? -ne 0 ]; then\n    echo \"❌ Notarization failed\"\n    exit 1\nfi\n\necho \"✅ Notarization completed successfully\"\n\n# Step 4: Staple the notarization ticket\necho \"📎 Stapling notarization ticket...\"\nxcrun stapler staple \"${BUNDLE_PATH}\"\n\nif [ $? -ne 0 ]; then\n    echo \"❌ Stapling failed\"\n    exit 1\nfi\n\necho \"✅ Stapling completed successfully\"\n\n# Step 5: Final verification\necho \"🔍 Final verification...\"\ncodesign --verify --verbose=2 \"${BUNDLE_PATH}\"\nxcrun stapler validate \"${BUNDLE_PATH}\"\n\necho \"🎉 Bundle successfully signed, notarized, and stapled!\"\necho \"📁 Signed bundle location: ${BUNDLE_PATH}\"\n\n# Clean up zip file\nrm -f \"${ZIP_PATH}\"\necho \"🧹 Cleaned up temporary zip file\"\n\necho \"📦 Creating zip for distribution\"\n/usr/bin/ditto -c -k --keepParent \"${BUNDLE_NAME}.saver\" \"${BUNDLE_NAME}.zip\"\nBUNDLE_PATH=\"${PROJECT_BUILD_PATH}/Build/Products/\"\nopen \"${BUNDLE_PATH}\"\n\necho \"🎉 Completed!\"\n\n";
+			shellScript = "\"${PROJECT_DIR}/Scripts/sign-notarize-staple.sh\"\n";
 		};
 		449CDCA32EBC5DD5003E91C7 /* Auto-Increment Build number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -205,11 +281,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\n# Auto-increment build number using PlistBuddy\n# Add this as a Run Script Phase in Xcode build phases (before \"Copy Bundle Resources\")\n\nset -e\n\n# Path to Info.plist in source directory\nINFO_PLIST=\"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n\n# Verify the Info.plist exists\nif [ ! -f \"${INFO_PLIST}\" ]; then\n    echo \"error: Info.plist not found at ${INFO_PLIST}\"\n    exit 1\nfi\n\necho \"📝 Incrementing build number in ${INFOPLIST_FILE}\"\n\n# Get the current build number\nCURRENT_BUILD=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFO_PLIST}\" 2>/dev/null || echo \"0\")\n\n# Increment it\nNEW_BUILD=$((CURRENT_BUILD + 1))\n\n# Update the Info.plist\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${NEW_BUILD}\" \"${INFO_PLIST}\"\n\n# Also ensure CFBundleShortVersionString exists (marketing version)\nVERSION=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${INFO_PLIST}\" 2>/dev/null || echo \"\")\n\nif [ -z \"${VERSION}\" ]; then\n    echo \"⚠️  CFBundleShortVersionString not found, setting to 1.0\"\n    /usr/libexec/PlistBuddy -c \"Add :CFBundleShortVersionString string 1.0\" \"${INFO_PLIST}\" 2>/dev/null || \\\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString 1.0\" \"${INFO_PLIST}\"\nfi\n\necho \"✅ Build number incremented: ${CURRENT_BUILD} → ${NEW_BUILD}\"\necho \"   Version: ${VERSION} (${NEW_BUILD})\"\n\n";
+			shellScript = "\"${PROJECT_DIR}/Scripts/auto-increment-build.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		440DF4002EC9330000D9FE4F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		44483AC72EA452BD00F49641 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -219,7 +302,57 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		440DF4182EC9341C00D9FE4F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 44483ACA2EA452BD00F49641 /* MysteryPrismClock */;
+			targetProxy = 440DF4172EC9341C00D9FE4F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		440DF4082EC9330000D9FE4F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 469QP4JCLF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moxiesoftware.MysteryPrismClockTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		440DF4092EC9330000D9FE4F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 469QP4JCLF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moxiesoftware.MysteryPrismClockTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		44483AD22EA452BD00F49641 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -418,6 +551,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		440DF40A2EC9330000D9FE4F /* Build configuration list for PBXNativeTarget "MysteryPrismClockTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				440DF4082EC9330000D9FE4F /* Debug */,
+				440DF4092EC9330000D9FE4F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		44483AC52EA452BD00F49641 /* Build configuration list for PBXProject "MysteryPrismClock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
