@@ -26,7 +26,7 @@ A dynamic macOS screen saver featuring an animated clock with moving, color-chan
 - **Platform**: macOS
 - **Framework**: ScreenSaver, SwiftUI
 - **Language**: Swift
-- **Minimum Supported OS Version**: macOS 15.6
+- **Minimum Supported OS Version**: macOS 14.8.2 or possibly earlier, pending testing
 
 ## Code Structure
 - `MysteryPrismScreenSaver.swift`: Main screen saver class that hosts the SwiftUI view
