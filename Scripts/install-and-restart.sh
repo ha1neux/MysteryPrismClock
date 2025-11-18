@@ -53,9 +53,9 @@ if [ -d "${INSTALLED_SAVER}" ]; then
     rm -rf "${INSTALLED_SAVER}"
 fi
 
-# Copy the new build to the installation directory
+# Copy the new build to the installation directory using ditto (preserves code signatures)
 echo -e "📥 Installing screensaver..."
-cp -R "${BUILT_PRODUCT_PATH}" "${INSTALLED_SAVER}"
+ditto "${BUILT_PRODUCT_PATH}" "${INSTALLED_SAVER}"
 
 # Verify installation
 if [ -d "${INSTALLED_SAVER}" ]; then
@@ -64,6 +64,35 @@ if [ -d "${INSTALLED_SAVER}" ]; then
 else
     echo -e "❌ Installation failed"
     exit 1
+fi
+
+# Sign the installed bundle
+# (This script runs before the built-in CodeSign step in the build phases,
+# so we need to explicitly sign the installed copy)
+echo -e "✍️  Signing installed screensaver..."
+
+# Get the code sign identity - prefer the expanded one if available
+SIGN_IDENTITY="${EXPANDED_CODE_SIGN_IDENTITY:-${CODE_SIGN_IDENTITY}}"
+
+# Get entitlements file if it exists
+ENTITLEMENTS_FILE="${CODE_SIGN_ENTITLEMENTS}"
+if [ -n "${ENTITLEMENTS_FILE}" ] && [ -f "${PROJECT_DIR}/${ENTITLEMENTS_FILE}" ]; then
+    codesign --force \
+             --sign "${SIGN_IDENTITY}" \
+             --timestamp \
+             --entitlements "${PROJECT_DIR}/${ENTITLEMENTS_FILE}" \
+             "${INSTALLED_SAVER}"
+else
+    codesign --force \
+             --sign "${SIGN_IDENTITY}" \
+             --timestamp \
+             "${INSTALLED_SAVER}"
+fi
+
+if [ $? -eq 0 ]; then
+    echo -e "✅ Screensaver signed successfully"
+else
+    echo -e "⚠️  Warning: Could not sign installed screensaver"
 fi
 
 # Touch the screensaver to update its modification date

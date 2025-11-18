@@ -36,9 +36,9 @@ class ClockViewModel: ObservableObject {
     private let baseSpeed: CGFloat = 0.16
     private let inset: CGFloat = 0.8
     private let clockSizeFactor: CGFloat = 2.0
-    private let directionChangeInterval: TimeInterval = 15.0
-    private let colorChangeInterval: TimeInterval = 30.0
-    private let colorTransitionDuration: TimeInterval = 2.0
+    private var directionChangeInterval: TimeInterval = 15.0
+    private var colorChangeInterval: TimeInterval = 30.0
+    private var colorTransitionDuration: TimeInterval = 2.0
     
     func setupInitialClock(screenSize: CGSize) {
         self.screenSize = screenSize
@@ -95,12 +95,22 @@ class ClockViewModel: ObservableObject {
         if now.timeIntervalSince(lastDirectionChange) >= directionChangeInterval {
             changeDirection()
             lastDirectionChange = now
+            if Double.random(in: 0.0...10.0) < 1.5 {
+                directionChangeInterval = TimeInterval.random(in: 2...4)
+            } else {
+                directionChangeInterval = TimeInterval.random(in: 13...17)
+            }
         }
         
         // Color change (every 30 seconds) - start transition
         if now.timeIntervalSince(lastColorChange) >= colorChangeInterval {
             startColorTransition()
             lastColorChange = now
+            if Double.random(in: 0.0...10.0) < 1.5 {
+                colorChangeInterval = TimeInterval.random(in: 5...10)
+            } else {
+                colorChangeInterval = TimeInterval.random(in: 23...35)
+            }
         }
         
         // Update color transition (only every 3 frames = ~20fps for smooth but efficient updates)
@@ -118,6 +128,7 @@ class ClockViewModel: ObservableObject {
                 if progress >= 1.0 {
                     isTransitioningColor = false
                     colorTransitionStartTime = nil
+                    colorTransitionDuration = TimeInterval.random(in: 1...3)
                 }
             }
         }
@@ -200,8 +211,17 @@ class ClockViewModel: ObservableObject {
         let angleChange = Double.random(in: -0.5...0.5)
         let currentAngle = atan2(velocity.y, velocity.x)
         let newAngle = currentAngle + angleChange
-        let speedVariation = CGFloat.random(in: 0.5...1.5)
-        let newSpeed = baseSpeed * speedVariation
+
+        // 15% chance for fast velocity, 85% for normal velocity
+        let speedMultiplier: CGFloat
+        if Double.random(in: 0.0...10.0) < 1.5 {
+            // Fast velocity (15% of the time)
+            speedMultiplier = CGFloat.random(in: 3.0...5.0)
+        } else {
+            // Normal velocity (85% of the time)
+            speedMultiplier = CGFloat.random(in: 0.5...1.5)
+        }
+        let newSpeed = baseSpeed * speedMultiplier
 
         velocity = CGPoint(
             x: Foundation.cos(newAngle) * newSpeed,
@@ -324,7 +344,7 @@ class ClockViewModel: ObservableObject {
         Screen: \(String(format: "%.0f", screenSize.width)) x \(String(format: "%.0f", screenSize.height))
         Time: \(String(format: "%02d", intHours)):\(String(format: "%02d", intMinutes)):\(String(format: "%02d", intSeconds))
         Position: (\(String(format: "%.1f", clockPosition.x)), \(String(format: "%.1f", clockPosition.y)))
-        Velocity: (\(String(format: "%.3f", velocity.x)), \(String(format: "%.3f", velocity.y))
+        Velocity: (\(String(format: "%.3f", velocity.x)), \(String(format: "%.3f", velocity.y)))
         Hour Hand: \(String(format: "%.3f", hours))h, \(String(format: "%.1f", angle * 180 / .pi))°
         Hour hand Tip: (\(String(format: "%.1f", tipPoint.x)), \(String(format: "%.1f", tipPoint.y)))
         Hour hand radius: \(String(format: "%.1f",radius))
