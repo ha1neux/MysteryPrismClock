@@ -12,6 +12,7 @@ struct SecondsDisk: View {
     let clockSize: CGFloat
     let inset: CGFloat
     let color: Color
+    let borderColor: Color
     
     var body: some View {
         let radius = clockSize * inset / 3.0
@@ -21,10 +22,19 @@ struct SecondsDisk: View {
             y: radius * Foundation.cos(angle) / 2.0
         )
         
-        Circle()
-            .fill(color)
-            .frame(width: radius * 2, height: radius * 2)
-            .offset(x: offset.x, y: -offset.y) // Flip y for SwiftUI coordinate system
+        ZStack {
+            // Pinstripe border
+            Circle()
+                .stroke(borderColor, lineWidth: 1)
+                .frame(width: radius * 2, height: radius * 2)
+                .offset(x: offset.x, y: -offset.y)
+            
+            // Fill
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .offset(x: offset.x, y: -offset.y) // Flip y for SwiftUI coordinate system
+        }
     }
 }
 

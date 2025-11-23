@@ -62,7 +62,8 @@ struct ClockView: View {
                 timeSeconds: timeComponents.seconds,
                 clockSize: clockSize,
                 inset: inset,
-                color: colors.sColor
+                color: colors.sColor,
+                borderColor: colors.sColor.hueOffset(by: 1.0/6.0)
             )
             
             // Clock hands

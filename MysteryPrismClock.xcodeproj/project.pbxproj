@@ -6,6 +6,12 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		44DE27942ED3222400111DE6 /* auto-increment-build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 44DE27902ED3222400111DE6 /* auto-increment-build.sh */; };
+		44DE27952ED3222400111DE6 /* install-and-restart.sh in Resources */ = {isa = PBXBuildFile; fileRef = 44DE27912ED3222400111DE6 /* install-and-restart.sh */; };
+		44DE27962ED3222400111DE6 /* sign-notarize-staple.sh in Resources */ = {isa = PBXBuildFile; fileRef = 44DE27922ED3222400111DE6 /* sign-notarize-staple.sh */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		440DF4172EC9341C00D9FE4F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -32,6 +38,9 @@
 		440DF4042EC9330000D9FE4F /* MysteryPrismClockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrismClockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		44DE27902ED3222400111DE6 /* auto-increment-build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "auto-increment-build.sh"; sourceTree = "<group>"; };
+		44DE27912ED3222400111DE6 /* install-and-restart.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-and-restart.sh"; sourceTree = "<group>"; };
+		44DE27922ED3222400111DE6 /* sign-notarize-staple.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "sign-notarize-staple.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -92,6 +101,7 @@
 			children = (
 				44A6FDC22EA4930F006854BE /* .gitignore */,
 				44483ACD2EA452BD00F49641 /* MysteryPrismClock */,
+				44DE27932ED3222400111DE6 /* Scripts */,
 				440DF4052EC9330000D9FE4F /* MysteryPrismClockTests */,
 				44483ACC2EA452BD00F49641 /* Products */,
 			);
@@ -104,6 +114,16 @@
 				440DF4042EC9330000D9FE4F /* MysteryPrismClockTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		44DE27932ED3222400111DE6 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				44DE27902ED3222400111DE6 /* auto-increment-build.sh */,
+				44DE27912ED3222400111DE6 /* install-and-restart.sh */,
+				44DE27922ED3222400111DE6 /* sign-notarize-staple.sh */,
+			);
+			path = Scripts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -152,8 +172,8 @@
 				44483AC82EA452BD00F49641 /* Frameworks */,
 				44483AC92EA452BD00F49641 /* Resources */,
 				44DC3D6F2EBBAFB6000B179E /* CopyFiles */,
-				44717C5A2EBCDCFC00BA018D /* Sign, Notarize, Staple, and make a zip file (release builds only) */,
 				44717BFC2EBC709600BA018D /* Install and Restart ScreenSaver */,
+				44DE27882ED3204900111DE6 /* sign-notarize-staple */,
 			);
 			buildRules = (
 			);
@@ -220,6 +240,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44DE27942ED3222400111DE6 /* auto-increment-build.sh in Resources */,
+				44DE27952ED3222400111DE6 /* install-and-restart.sh in Resources */,
+				44DE27962ED3222400111DE6 /* sign-notarize-staple.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,25 +268,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PROJECT_DIR}/Scripts/install-and-restart.sh\"\n";
 		};
-		44717C5A2EBCDCFC00BA018D /* Sign, Notarize, Staple, and make a zip file (release builds only) */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Sign, Notarize, Staple, and make a zip file (release builds only)";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/Scripts/sign-notarize-staple.sh\"\n";
-		};
 		449CDCA32EBC5DD5003E91C7 /* Auto-Increment Build number */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -282,6 +286,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PROJECT_DIR}/Scripts/auto-increment-build.sh\"\n";
+		};
+		44DE27882ED3204900111DE6 /* sign-notarize-staple */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "sign-notarize-staple";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/Scripts/sign-notarize-staple.sh\"\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -487,15 +510,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = MysteryPrismClock/MysteryPrism.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MysteryPrismClock/MysteryPrismClock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 60;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = RUHYK57MF9;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 469QP4JCLF;
 				INFOPLIST_FILE = MysteryPrismClock/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver";
@@ -520,15 +543,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = MysteryPrismClock/MysteryPrism.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MysteryPrismClock/MysteryPrismClock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 60;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = RUHYK57MF9;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 469QP4JCLF;
 				INFOPLIST_FILE = MysteryPrismClock/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = "$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver";

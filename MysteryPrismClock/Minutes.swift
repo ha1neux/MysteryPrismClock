@@ -13,9 +13,18 @@ struct MinuteHandView: View {
     let inset: CGFloat
     let insideColor: Color
     let outsideColor: Color
+    let borderColor: Color
     
     var body: some View {
         ZStack {
+            // Pinstripe border
+            minutePath(
+                timeComponents: (seconds: 0.0, minutes: timeComponents.minutes, hours: 0.0),
+                clockSize: clockSize,
+                inset: inset
+            )
+            .stroke(borderColor, lineWidth: 1)
+            
             // Draw the full minute hand in outsideColor
             minutePath(
                 timeComponents: (seconds: 0.0, minutes: timeComponents.minutes, hours: 0.0),
@@ -88,6 +97,8 @@ func MinuteHand(
         clockSize: clockSize,
         inset: inset,
         insideColor: colors.mColor,
-        outsideColor: colors.mPrimeColor
+        outsideColor: colors.mPrimeColor,
+        borderColor: colors.mColor.hueOffset(by: 1.0/6.0)
     )
 }
+

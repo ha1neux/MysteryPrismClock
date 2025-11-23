@@ -17,15 +17,18 @@ func MinuteHourOverlap(
         timeComponents: timeComponents,
         clockSize: clockSize,
         inset: inset,
-        overlapColor: colors.hmColor
+        overlapColor: colors.hmColor,
+        borderColor: colors.hmColor.hueOffset(by: 1.0/6.0)
     )
 }
+
 
 struct MinuteHourOverlapView: View {
     let timeComponents: (seconds: Double, minutes: Double, hours: Double)
     let clockSize: CGFloat
     let inset: CGFloat
     let overlapColor: Color
+    let borderColor: Color
     
     var body: some View {
         // Create paths for both hands using the helper functions
@@ -42,6 +45,11 @@ struct MinuteHourOverlapView: View {
         
         // Create intersection using blend mode
         ZStack {
+            // Pinstripe border
+            minuteHandPath
+                .stroke(borderColor, lineWidth: 1)
+                .mask(hourHandPath)
+            
             minuteHandPath
                 .fill(overlapColor.opacity(0.0)) // Invisible base
             

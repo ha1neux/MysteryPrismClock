@@ -18,9 +18,11 @@ func HourHand(
         clockSize: clockSize,
         inset: inset,
         insideColor: colors.hColor,
-        outsideColor: colors.hPrimeColor
+        outsideColor: colors.hPrimeColor,
+        borderColor: colors.hColor.hueOffset(by: 1.0/6.0)
     )
 }
+
 
 struct HourHandView: View {
     let timeComponents: (seconds: Double, minutes: Double, hours: Double)
@@ -28,9 +30,18 @@ struct HourHandView: View {
     let inset: CGFloat
     let insideColor: Color
     let outsideColor: Color
+    let borderColor: Color
     
     var body: some View {
         ZStack {
+            // Pinstripe border
+            hourPath(
+                timeComponents: (seconds: 0.0, minutes: 0.0, hours: timeComponents.hours),
+                clockSize: clockSize,
+                inset: inset
+            )
+            .stroke(borderColor, lineWidth: 1)
+            
             // Draw the full hour hand in outsideColor
             hourPath(
                 timeComponents: (seconds: 0.0, minutes: 0.0, hours: timeComponents.hours),

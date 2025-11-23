@@ -5,9 +5,15 @@
       location = "self:">
    </FileRef>
    <FileRef
-      location = "group:check_version_settings.sh">
+      location = "group:setup-notarization.sh">
    </FileRef>
    <FileRef
-      location = "group:increment_build.sh">
+      location = "container:../notarize.sh">
+   </FileRef>
+   <FileRef
+      location = "group:notarize.sh">
+   </FileRef>
+   <FileRef
+      location = "group:setup-scripts.sh">
    </FileRef>
 </Workspace>
