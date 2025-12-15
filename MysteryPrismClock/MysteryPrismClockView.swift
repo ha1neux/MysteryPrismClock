@@ -9,6 +9,8 @@ import SwiftUI
 
 struct MysteryPrismClockView: View {
     @StateObject private var viewModel = ClockViewModel()
+    @State private var opacity: CGFloat = 0.0
+    
     // Constants
     private let clockSizeFactor: CGFloat = 2.0
     private let inset: CGFloat = 0.8
@@ -17,6 +19,7 @@ struct MysteryPrismClockView: View {
     // Movement constants
     private let directionChangeInterval: TimeInterval = 15.0
     private let colorChangeInterval: TimeInterval = 30.0
+    private let fadeInDuration: TimeInterval = 5.0
     
     private func calculateClockSize(for geometry: CGSize) -> CGFloat {
         // Use the smaller dimension to ensure the clock fits
@@ -39,7 +42,8 @@ struct MysteryPrismClockView: View {
                     clockBaseColor: viewModel.clockBaseColor,
                     clockSize: calculateClockSize(for: geometry.size),
                     inset: inset,
-                    insetPrime: insetPrime
+                    insetPrime: insetPrime,
+                    opacity: opacity
                 )
                 .position(viewModel.clockPosition == .zero ? CGPoint(x: geometry.size.width/2, y: geometry.size.height/2) : viewModel.clockPosition)
                 
@@ -76,6 +80,11 @@ struct MysteryPrismClockView: View {
                 SharedTimerManager.shared.currentViewModel = viewModel
                 
                 FileLogger.shared.info("Clock view: Registered viewModel[\(ObjectIdentifier(viewModel).hashValue)] with SharedTimerManager")
+                
+                // Start fade-in animation
+                withAnimation(.easeIn(duration: fadeInDuration)) {
+                    opacity = 1.0
+                }
                 
                 // Add a small delay to ensure geometry is properly initialized
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak viewModel] in

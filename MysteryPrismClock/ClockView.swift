@@ -15,6 +15,7 @@ struct ClockView: View {
     let clockSize: CGFloat
     let inset: CGFloat
     let insetPrime: CGFloat
+    var opacity: CGFloat = 1.0  // Add opacity parameter with default value
     
     private var timeComponents: (seconds: Double, minutes: Double, hours: Double) {
         let calendar = Calendar.current
@@ -51,11 +52,13 @@ struct ClockView: View {
                 .fill(clockBaseColor)
                 .stroke(Color.gray, lineWidth: clockSize * insetPrime / 6.5)
                 .frame(width: clockSize, height: clockSize)
+                .opacity(opacity)
             
             // Clock face
             Circle()
                 .fill(colors.sPrimeColor)
                 .frame(width: clockSize * inset, height: clockSize * inset)
+                .opacity(opacity)
             
             // Seconds disk
             SecondsDisk(
@@ -65,6 +68,7 @@ struct ClockView: View {
                 color: colors.sColor,
                 borderColor: colors.sColor.hueOffset(by: 1.0/6.0)
             )
+            .opacity(opacity)
             
             // Clock hands
             MinuteHand(
@@ -73,6 +77,7 @@ struct ClockView: View {
                 inset: inset,
                 colors: colors
             )
+            .opacity(opacity)
             
             HourHand(
                 timeComponents: timeComponents,
@@ -80,6 +85,7 @@ struct ClockView: View {
                 inset: inset,
                 colors: colors
             )
+            .opacity(opacity)
             
             MinuteHourOverlap(
                 timeComponents: timeComponents,
@@ -87,6 +93,7 @@ struct ClockView: View {
                 inset: inset,
                 colors: colors
             )
+            .opacity(opacity)
             
             MinuteHourSecondsOverlap(
                 timeComponents: timeComponents,
@@ -94,8 +101,9 @@ struct ClockView: View {
                 inset: inset,
                 colors: colors
             )
+            .opacity(opacity)
             
-            // Center dot
+            // Center dot - always fully opaque
             Circle()
                 .fill(Color.black)
                 .frame(width: clockSize / 3.0, height: clockSize / 3.0)
