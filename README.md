@@ -210,6 +210,3 @@ MIT License. Please feel free to re-use the code for your own projects. Please f
 
 ## Author
 Created by Bill Coderre in October/November 2025.
-
-## Wish for Xcode/Claude enhancement
-Xcode's Claude connection cannot "see" (whatever that means) projects' `.xcodeproj` files. This is a sadness.
