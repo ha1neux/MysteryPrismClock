@@ -56,6 +56,7 @@ struct ClockView: View {
             // Clock face
             Circle()
                 .fill(c.sPrimeColor)
+                .stroke(c.sPrimeBorderColor, lineWidth: 1)
                 .frame(width: clockSize * inset, height: clockSize * inset)
                 .opacity(opacity)
             

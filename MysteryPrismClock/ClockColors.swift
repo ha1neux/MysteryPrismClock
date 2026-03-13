@@ -16,6 +16,7 @@ struct ClockColors {
     let hPrimeColor: Color
     let hmColor: Color
     let hmPrimeColor: Color
+    let sPrimeBorderColor: Color
     let sBorderColor: Color
     let mBorderColor: Color
     let hBorderColor: Color
@@ -76,6 +77,8 @@ struct ClockColors {
         hmPrimeColor = mPrimeColor
 
         // Border colors: 60° ahead for pinstripe contrast
+        sPrimeBorderColor = Color(hue: (sPrimeHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
+                                  saturation: sat, brightness: brt)
         sBorderColor = Color(hue: (sHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
                              saturation: sat, brightness: brt)
         mBorderColor = Color(hue: (mHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
