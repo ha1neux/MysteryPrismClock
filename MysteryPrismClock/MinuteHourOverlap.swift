@@ -18,7 +18,7 @@ func MinuteHourOverlap(
         clockSize: clockSize,
         inset: inset,
         overlapColor: colors.hmColor,
-        borderColor: colors.hmColor.hueOffset(by: 1.0/6.0)
+        borderColor: colors.hmBorderColor
     )
 }
 

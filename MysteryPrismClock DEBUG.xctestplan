@@ -1,0 +1,42 @@
+{
+  "configurations" : [
+    {
+      "id" : "F4A9B5BC-89C7-46A3-AF2F-A8854187DA3E",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-debug"
+      },
+      {
+        "argument" : "-module"
+      },
+      {
+        "argument" : "MysteryPrism"
+      }
+    ],
+    "environmentVariableEntries" : [
+      {
+        "key" : "IDEPreferLogStreaming",
+        "value" : "YES"
+      }
+    ],
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:MysteryPrismClock.xcodeproj",
+        "identifier" : "440DF4032EC9330000D9FE4F",
+        "name" : "MysteryPrismClockTests"
+      }
+    }
+  ],
+  "version" : 1
+}

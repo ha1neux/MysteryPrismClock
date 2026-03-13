@@ -54,11 +54,11 @@ struct MysteryPrismClockView: View {
                             VStack(alignment: .leading) {
                                 Text(viewModel.debugInfo)
                                     .font(.system(.caption, design: .monospaced))
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                             }
                             .padding(12)
                             .background(Color.red.opacity(0.8))
-                            .cornerRadius(8)
+                            .clipShape(.rect(cornerRadius: 8))
                             Spacer()
                         }
                         .padding()

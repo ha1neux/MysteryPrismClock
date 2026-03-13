@@ -16,38 +16,28 @@ struct MinuteHandView: View {
     let borderColor: Color
     
     var body: some View {
+        let hand = minutePath(
+            timeComponents: (seconds: 0.0, minutes: timeComponents.minutes, hours: 0.0),
+            clockSize: clockSize,
+            inset: inset
+        )
+
         ZStack {
             // Pinstripe border
-            minutePath(
-                timeComponents: (seconds: 0.0, minutes: timeComponents.minutes, hours: 0.0),
-                clockSize: clockSize,
-                inset: inset
-            )
-            .stroke(borderColor, lineWidth: 1)
+            hand.stroke(borderColor, lineWidth: 1)
             
             // Draw the full minute hand in outsideColor
-            minutePath(
-                timeComponents: (seconds: 0.0, minutes: timeComponents.minutes, hours: 0.0),
-                clockSize: clockSize,
-                inset: inset
-            )
-            .fill(outsideColor)
+            hand.fill(outsideColor)
             
             // Draw the overlapping area with seconds disk in insideColor
-            minutePath(
-                timeComponents: (seconds: 0.0, minutes: timeComponents.minutes, hours: 0.0),
-                clockSize: clockSize,
-                inset: inset
-            )
-            .fill(insideColor)
-            .mask(
-                // Create seconds disk path for masking
-                secondsPath(
-                    timeComponents: timeComponents,
-                    clockSize: clockSize,
-                    inset: inset
+            hand.fill(insideColor)
+                .mask(
+                    secondsPath(
+                        timeComponents: timeComponents,
+                        clockSize: clockSize,
+                        inset: inset
+                    )
                 )
-            )
         }
         .frame(width: clockSize, height: clockSize)
     }
@@ -98,7 +88,7 @@ func MinuteHand(
         inset: inset,
         insideColor: colors.mColor,
         outsideColor: colors.mPrimeColor,
-        borderColor: colors.mColor.hueOffset(by: 1.0/6.0)
+        borderColor: colors.mBorderColor
     )
 }
 

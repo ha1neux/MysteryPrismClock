@@ -16,6 +16,11 @@ struct ClockColors {
     let hPrimeColor: Color
     let hmColor: Color
     let hmPrimeColor: Color
+    let sBorderColor: Color
+    let mBorderColor: Color
+    let hBorderColor: Color
+    let hmBorderColor: Color
+    let hmPrimeBorderColor: Color
     
     /// Initializes clock colors based on a base color and current time components
     /// Colors are calculated in HSB (Hue-Saturation-Brightness) space, where hue values range from 0.0 to 1.0 representing the full color wheel
@@ -31,52 +36,55 @@ struct ClockColors {
     /// - Hours advance the hue by hours/12 (one full rotation per 12 hours)
     /// - Prime colors are offset by 1/6 (60 degrees or one color wheel segment) for visual contrast
     init(baseColor: Color, timeComponents: (seconds: Double, minutes: Double, hours: Double)) {
-        // Convert base color to HSB components (Hue, Saturation, Brightness)
+        // Convert base color to HSB components once (only NSColor round-trip)
         let baseHSB = baseColor.hsb
+        let sat = baseHSB.saturation
+        let brt = baseHSB.brightness
 
-        // SECONDS COLOR: Base hue + seconds offset
-        // Calculation: hue advances by 1/60th per second, completing full rotation in 60 seconds
-        // Example: At 30 seconds with base hue 0.5 -> 0.5 + 0.5 = 1.0 (wraps to 0.0)
-        var hue = baseHSB.hue + timeComponents.seconds / 60.0
-        if hue > 1.0 { hue -= 1.0 }  // Wrap around the color wheel (modulo 1.0)
-        sColor = Color(hue: hue, saturation: baseHSB.saturation, brightness: baseHSB.brightness)
+        // Seconds hue: base + seconds/60 (one full rotation per minute)
+        let sHue = (baseHSB.hue + timeComponents.seconds / 60.0)
+            .truncatingRemainder(dividingBy: 1.0)
+        sColor = Color(hue: sHue, saturation: sat, brightness: brt)
 
-        // SECONDS PRIME COLOR: Offset by 60 degrees (1/6 of color wheel) for complementary appearance
-        // Calculation: Subtract 1/6 from seconds color hue
-        // Example: If sColor hue is 0.5 -> 0.5 - 0.1667 = 0.3333
-        hue = sColor.hsb.hue - 1.0 / 6.0
-        if hue < 0.0 { hue += 1.0 }  // Wrap around if negative
-        sPrimeColor = Color(hue: hue, saturation: baseHSB.saturation, brightness: baseHSB.brightness)
+        // Seconds prime: 60° behind seconds for visual contrast
+        var sPrimeHue = sHue - 1.0 / 6.0
+        if sPrimeHue < 0.0 { sPrimeHue += 1.0 }
+        sPrimeColor = Color(hue: sPrimeHue, saturation: sat, brightness: brt)
 
-        // MINUTES COLOR: Seconds color + minutes offset
-        // Calculation: hue advances by 1/60th per minute, completing full rotation in 60 minutes
-        // Example: At 15 minutes with sColor hue 0.3 -> 0.3 + 0.25 = 0.55
-        hue = sColor.hsb.hue + timeComponents.minutes / 60.0
-        if hue > 1.0 { hue -= 1.0 }
-        mColor = Color(hue: hue, saturation: baseHSB.saturation, brightness: baseHSB.brightness)
+        // Minutes: seconds hue + minutes/60 (one full rotation per hour)
+        let mHue = (sHue + timeComponents.minutes / 60.0)
+            .truncatingRemainder(dividingBy: 1.0)
+        mColor = Color(hue: mHue, saturation: sat, brightness: brt)
 
-        // MINUTES PRIME COLOR: Prime version based on sPrimeColor
-        // Maintains the 60-degree offset relationship
-        hue = sPrimeColor.hsb.hue + timeComponents.minutes / 60.0
-        if hue > 1.0 { hue -= 1.0 }
-        mPrimeColor = Color(hue: hue, saturation: baseHSB.saturation, brightness: baseHSB.brightness)
+        // Minutes prime: sPrime hue + minutes/60
+        let mPrimeHue = (sPrimeHue + timeComponents.minutes / 60.0)
+            .truncatingRemainder(dividingBy: 1.0)
+        mPrimeColor = Color(hue: mPrimeHue, saturation: sat, brightness: brt)
 
-        // HOURS COLOR: Seconds color + hours offset
-        // Calculation: hue advances by 1/12th per hour, completing full rotation in 12 hours
-        // Example: At 6 hours with sColor hue 0.2 -> 0.2 + 0.5 = 0.7
-        hue = sColor.hsb.hue + timeComponents.hours / 12.0
-        if hue > 1.0 { hue -= 1.0 }
-        hColor = Color(hue: hue, saturation: baseHSB.saturation, brightness: baseHSB.brightness)
+        // Hours: seconds hue + hours/12 (one full rotation per 12 hours)
+        let hHue = (sHue + timeComponents.hours / 12.0)
+            .truncatingRemainder(dividingBy: 1.0)
+        hColor = Color(hue: hHue, saturation: sat, brightness: brt)
 
-        // HOURS PRIME COLOR: Prime version based on sPrimeColor
-        // Maintains the 60-degree offset relationship
-        hue = sPrimeColor.hsb.hue + timeComponents.hours / 12.0
-        if hue > 1.0 { hue -= 1.0 }
-        hPrimeColor = Color(hue: hue, saturation: baseHSB.saturation, brightness: baseHSB.brightness)
+        // Hours prime: sPrime hue + hours/12
+        let hPrimeHue = (sPrimeHue + timeComponents.hours / 12.0)
+            .truncatingRemainder(dividingBy: 1.0)
+        hPrimeColor = Color(hue: hPrimeHue, saturation: sat, brightness: brt)
 
-        // OVERLAP COLORS: Used where clock hands overlap
-        // Simplified to use minute colors (could be blended in future)
+        // Overlap colors: used where clock hands overlap
         hmColor = mColor
         hmPrimeColor = mPrimeColor
+
+        // Border colors: 60° ahead for pinstripe contrast
+        sBorderColor = Color(hue: (sHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
+                             saturation: sat, brightness: brt)
+        mBorderColor = Color(hue: (mHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
+                             saturation: sat, brightness: brt)
+        hBorderColor = Color(hue: (hHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
+                             saturation: sat, brightness: brt)
+        hmBorderColor = Color(hue: (mHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
+                              saturation: sat, brightness: brt)
+        hmPrimeBorderColor = Color(hue: (mPrimeHue + 1.0 / 6.0).truncatingRemainder(dividingBy: 1.0),
+                                   saturation: sat, brightness: brt)
     }
 }

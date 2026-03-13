@@ -32,10 +32,8 @@ extension Color {
     /// - Returns: A new color with the same saturation and brightness but offset hue
     func hueOffset(by offset: Double) -> Color {
         let hsbComponents = self.hsb
-        var newHue = hsbComponents.hue + offset
-        
-        // Wrap around the color wheel
-        if newHue > 1.0 { newHue -= 1.0 }
+        var newHue = (hsbComponents.hue + offset)
+            .truncatingRemainder(dividingBy: 1.0)
         if newHue < 0.0 { newHue += 1.0 }
         
         return Color(hue: newHue, saturation: hsbComponents.saturation, brightness: hsbComponents.brightness)

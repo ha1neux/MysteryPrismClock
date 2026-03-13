@@ -17,9 +17,9 @@ class ClockViewModel: ObservableObject {
     @Published var debugInfo: String = "Debug mode active - waiting for data..."
     @Published var showDebugInfo = false
     
-    private var lastDirectionChange: Date = Date()
-    private var lastColorChange: Date = Date()
-    private var lastDebugUpdate: Date = Date()
+    private var lastDirectionChange: Date = .now
+    private var lastColorChange: Date = .now
+    private var lastDebugUpdate: Date = .now
     private var frameCount: Int = 0
     private var isRunning = false
     

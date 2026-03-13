@@ -17,9 +17,9 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.9</string>
 	<key>CFBundleVersion</key>
-	<string>131</string>
+	<string>140</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2025 Bill Coderre. All rights reserved.</string>
+	<string>Copyright © 2025-2026 Bill Coderre. MIT License.</string>
 	<key>NSPrincipalClass</key>
 	<string>$(PRODUCT_MODULE_NAME).MysteryPrismScreenSaver</string>
 </dict>

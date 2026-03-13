@@ -19,7 +19,7 @@ func HourHand(
         inset: inset,
         insideColor: colors.hColor,
         outsideColor: colors.hPrimeColor,
-        borderColor: colors.hColor.hueOffset(by: 1.0/6.0)
+        borderColor: colors.hBorderColor
     )
 }
 
@@ -33,38 +33,28 @@ struct HourHandView: View {
     let borderColor: Color
     
     var body: some View {
+        let hand = hourPath(
+            timeComponents: (seconds: 0.0, minutes: 0.0, hours: timeComponents.hours),
+            clockSize: clockSize,
+            inset: inset
+        )
+
         ZStack {
             // Pinstripe border
-            hourPath(
-                timeComponents: (seconds: 0.0, minutes: 0.0, hours: timeComponents.hours),
-                clockSize: clockSize,
-                inset: inset
-            )
-            .stroke(borderColor, lineWidth: 1)
+            hand.stroke(borderColor, lineWidth: 1)
             
             // Draw the full hour hand in outsideColor
-            hourPath(
-                timeComponents: (seconds: 0.0, minutes: 0.0, hours: timeComponents.hours),
-                clockSize: clockSize,
-                inset: inset
-            )
-            .fill(outsideColor)
+            hand.fill(outsideColor)
             
             // Draw the overlapping area with seconds disk in insideColor
-            hourPath(
-                timeComponents: (seconds: 0.0, minutes: 0.0, hours: timeComponents.hours),
-                clockSize: clockSize,
-                inset: inset
-            )
-            .fill(insideColor)
-            .mask(
-                // Create seconds disk path for masking
-                secondsPath(
-                    timeComponents: timeComponents,
-                    clockSize: clockSize,
-                    inset: inset
+            hand.fill(insideColor)
+                .mask(
+                    secondsPath(
+                        timeComponents: timeComponents,
+                        clockSize: clockSize,
+                        inset: inset
+                    )
                 )
-            )
         }
         .frame(width: clockSize, height: clockSize)
     }

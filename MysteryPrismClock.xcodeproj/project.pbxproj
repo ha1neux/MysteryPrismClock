@@ -38,6 +38,7 @@
 		440DF4042EC9330000D9FE4F /* MysteryPrismClockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrismClockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		44483ACB2EA452BD00F49641 /* MysteryPrism.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MysteryPrism.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		44A6FDC22EA4930F006854BE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		44D085E92F64B6FF0071BF8D /* MysteryPrismClock DEBUG.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MysteryPrismClock DEBUG.xctestplan"; sourceTree = "<group>"; };
 		44DE27902ED3222400111DE6 /* auto-increment-build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "auto-increment-build.sh"; sourceTree = "<group>"; };
 		44DE27912ED3222400111DE6 /* install-and-restart.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-and-restart.sh"; sourceTree = "<group>"; };
 		44DE27922ED3222400111DE6 /* sign-notarize-staple.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "sign-notarize-staple.sh"; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 				44A6FDC22EA4930F006854BE /* .gitignore */,
 				44483ACD2EA452BD00F49641 /* MysteryPrismClock */,
 				44DE27932ED3222400111DE6 /* Scripts */,
+				44D085E92F64B6FF0071BF8D /* MysteryPrismClock DEBUG.xctestplan */,
 				440DF4052EC9330000D9FE4F /* MysteryPrismClockTests */,
 				44483ACC2EA452BD00F49641 /* Products */,
 			);

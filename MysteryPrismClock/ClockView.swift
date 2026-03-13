@@ -41,11 +41,10 @@ struct ClockView: View {
         return (seconds, minutes, hours)
     }
     
-    private var colors: ClockColors {
-        ClockColors(baseColor: clockBaseColor, timeComponents: timeComponents)
-    }
-        
     var body: some View {
+        let tc = timeComponents
+        let c = ClockColors(baseColor: clockBaseColor, timeComponents: tc)
+
         ZStack {
             // Clock frame with gray border and filled with clockBaseColor
             RoundedRectangle(cornerRadius: clockSize * insetPrime)
@@ -56,50 +55,50 @@ struct ClockView: View {
             
             // Clock face
             Circle()
-                .fill(colors.sPrimeColor)
+                .fill(c.sPrimeColor)
                 .frame(width: clockSize * inset, height: clockSize * inset)
                 .opacity(opacity)
             
             // Seconds disk
             SecondsDisk(
-                timeSeconds: timeComponents.seconds,
+                timeSeconds: tc.seconds,
                 clockSize: clockSize,
                 inset: inset,
-                color: colors.sColor,
-                borderColor: colors.sColor.hueOffset(by: 1.0/6.0)
+                color: c.sColor,
+                borderColor: c.sBorderColor
             )
             .opacity(opacity)
             
             // Clock hands
             MinuteHand(
-                timeComponents: timeComponents,
+                timeComponents: tc,
                 clockSize: clockSize,
                 inset: inset,
-                colors: colors
+                colors: c
             )
             .opacity(opacity)
             
             HourHand(
-                timeComponents: timeComponents,
+                timeComponents: tc,
                 clockSize: clockSize,
                 inset: inset,
-                colors: colors
+                colors: c
             )
             .opacity(opacity)
             
             MinuteHourOverlap(
-                timeComponents: timeComponents,
+                timeComponents: tc,
                 clockSize: clockSize,
                 inset: inset,
-                colors: colors
+                colors: c
             )
             .opacity(opacity)
             
             MinuteHourSecondsOverlap(
-                timeComponents: timeComponents,
+                timeComponents: tc,
                 clockSize: clockSize,
                 inset: inset,
-                colors: colors
+                colors: c
             )
             .opacity(opacity)
             
