@@ -46,61 +46,57 @@ struct ClockView: View {
         let c = ClockColors(baseColor: clockBaseColor, timeComponents: tc)
 
         ZStack {
-            // Clock frame with gray border and filled with clockBaseColor
-            RoundedRectangle(cornerRadius: clockSize * insetPrime)
-                .fill(clockBaseColor)
-                .stroke(Color.gray, lineWidth: clockSize * insetPrime / 6.5)
-                .frame(width: clockSize, height: clockSize)
-                .opacity(opacity)
-            
-            // Clock face
-            Circle()
-                .fill(c.sPrimeColor)
-                .stroke(c.sPrimeBorderColor, lineWidth: 1)
-                .frame(width: clockSize * inset, height: clockSize * inset)
-                .opacity(opacity)
-            
-            // Seconds disk
-            SecondsDisk(
-                timeSeconds: tc.seconds,
-                clockSize: clockSize,
-                inset: inset,
-                color: c.sColor,
-                borderColor: c.sBorderColor
-            )
-            .opacity(opacity)
-            
-            // Clock hands
-            MinuteHand(
-                timeComponents: tc,
-                clockSize: clockSize,
-                inset: inset,
-                colors: c
-            )
-            .opacity(opacity)
-            
-            HourHand(
-                timeComponents: tc,
-                clockSize: clockSize,
-                inset: inset,
-                colors: c
-            )
-            .opacity(opacity)
-            
-            MinuteHourOverlap(
-                timeComponents: tc,
-                clockSize: clockSize,
-                inset: inset,
-                colors: c
-            )
-            .opacity(opacity)
-            
-            MinuteHourSecondsOverlap(
-                timeComponents: tc,
-                clockSize: clockSize,
-                inset: inset,
-                colors: c
-            )
+            Group {
+                // Clock frame with gray border and filled with clockBaseColor
+                RoundedRectangle(cornerRadius: clockSize * insetPrime)
+                    .fill(clockBaseColor)
+                    .stroke(Color.gray, lineWidth: clockSize * insetPrime / 6.5)
+                    .frame(width: clockSize, height: clockSize)
+                
+                // Clock face
+                Circle()
+                    .fill(c.sPrimeColor)
+                    .stroke(c.sPrimeBorderColor, lineWidth: 1)
+                    .frame(width: clockSize * inset, height: clockSize * inset)
+                
+                // Seconds disk
+                SecondsDisk(
+                    timeSeconds: tc.seconds,
+                    clockSize: clockSize,
+                    inset: inset,
+                    color: c.sColor,
+                    borderColor: c.sBorderColor
+                )
+                
+                // Clock hands
+                MinuteHand(
+                    timeComponents: tc,
+                    clockSize: clockSize,
+                    inset: inset,
+                    colors: c
+                )
+                
+                HourHand(
+                    timeComponents: tc,
+                    clockSize: clockSize,
+                    inset: inset,
+                    colors: c
+                )
+                
+                MinuteHourOverlap(
+                    timeComponents: tc,
+                    clockSize: clockSize,
+                    inset: inset,
+                    colors: c
+                )
+                
+                MinuteHourSecondsOverlap(
+                    timeComponents: tc,
+                    clockSize: clockSize,
+                    inset: inset,
+                    colors: c
+                )
+            }
             .opacity(opacity)
             
             // Center dot - always fully opaque
