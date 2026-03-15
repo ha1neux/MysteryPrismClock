@@ -49,7 +49,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				ClockColors.swift,
-				ClockPaths.swift,
 				ClockView.swift,
 				ClockViewModel.swift,
 				ColorExtension.swift,
@@ -62,6 +61,7 @@
 				MysteryPrismScreenSaver.swift,
 				"Orphan Detection.swift",
 				Seconds.swift,
+				SharedTimerManager.swift,
 			);
 			target = 440DF4032EC9330000D9FE4F /* MysteryPrismClockTests */;
 		};

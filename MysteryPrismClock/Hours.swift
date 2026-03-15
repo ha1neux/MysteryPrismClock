@@ -7,23 +7,6 @@
 
 import SwiftUI
 
-func HourHand(
-    timeComponents: (seconds: Double, minutes: Double, hours: Double),
-    clockSize: CGFloat,
-    inset: CGFloat,
-    colors: ClockColors
-) -> some View {
-    HourHandView(
-        timeComponents: timeComponents,
-        clockSize: clockSize,
-        inset: inset,
-        insideColor: colors.hColor,
-        outsideColor: colors.hPrimeColor,
-        borderColor: colors.hBorderColor
-    )
-}
-
-
 struct HourHandView: View {
     let timeComponents: (seconds: Double, minutes: Double, hours: Double)
     let clockSize: CGFloat

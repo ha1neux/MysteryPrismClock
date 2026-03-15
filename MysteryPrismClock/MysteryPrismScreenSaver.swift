@@ -8,25 +8,6 @@
 import ScreenSaver
 import SwiftUI
 
-// Shared timer manager that can be accessed from the screensaver wrapper
-public class SharedTimerManager {
-    public static let shared = SharedTimerManager()
-    
-    weak var currentViewModel: ClockViewModel? {
-        didSet {
-            if let vm = currentViewModel {
-                FileLogger.shared.info("SharedTimerManager: currentViewModel SET to [\(ObjectIdentifier(vm).hashValue)]")
-            } else {
-                FileLogger.shared.info("SharedTimerManager: currentViewModel CLEARED (nil)")
-            }
-        }
-    }
-    
-    private init() {
-        FileLogger.shared.info("SharedTimerManager: Singleton initialized")
-    }
-}
-
 class MysteryPrismScreenSaver: ScreenSaverView {
     private var hostingView: NSHostingView<MysteryPrismClockView>!
     private weak var viewModel: ClockViewModel?
@@ -36,7 +17,7 @@ class MysteryPrismScreenSaver: ScreenSaverView {
     var hasCleanedUp = false
     var isStopped = false  // Flag to prevent any updates after stop
     var hasBeenVisible = false  // Track if window has ever been visible
-    var orphanDetectionTimer: Timer?  // Timer to detect if we're orphaned
+    var orphanDetectionTask: Task<Void, Never>?  // Task to detect if we're orphaned
     
     override init?(frame: NSRect, isPreview: Bool) {
         Self.instanceCounter += 1
@@ -93,7 +74,8 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         FileLogger.shared.info("ScreenSaver[\(instanceID)]: Added hosting view to subview hierarchy")
         
         // Store a weak reference to the view model for cleanup
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(200))
             guard let self = self else { return }
             self.viewModel = SharedTimerManager.shared.currentViewModel
             if let vm = self.viewModel {
@@ -203,15 +185,14 @@ class MysteryPrismScreenSaver: ScreenSaverView {
         FileLogger.shared.info("ScreenSaver[\(instanceID)]: CPU usage should now drop to 0%")
         FileLogger.shared.info("ScreenSaver[\(instanceID)]: Waiting for post-dismissal checks in 5s and 10s...")
         
-        // Check 5 seconds later if there's still CPU usage
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [instanceID] in
+        // Check 5 and 10 seconds later if there's still CPU usage
+        Task { @MainActor [instanceID] in
+            try? await Task.sleep(for: .seconds(5))
             FileLogger.shared.logSeparator("POST-DISMISSAL CHECK (5s)")
             FileLogger.shared.info("⏰ ScreenSaver[\(instanceID)]: 5 seconds after dismissal")
             FileLogger.shared.info("📊 Check Activity Monitor for CPU usage - should be near 0%")
-        }
-        
-        // Check 10 seconds later too
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [instanceID] in
+            
+            try? await Task.sleep(for: .seconds(5))
             FileLogger.shared.logSeparator("POST-DISMISSAL CHECK (10s)")
             FileLogger.shared.info("⏰ ScreenSaver[\(instanceID)]: 10 seconds after dismissal - FINAL CHECK")
         }

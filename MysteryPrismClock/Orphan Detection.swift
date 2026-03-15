@@ -10,15 +10,15 @@ import SwiftUI
 extension MysteryPrismScreenSaver {
     // MARK: - Orphan Detection
     
-    /// Start a timer to detect if this instance was orphaned (created but never actually used)
+    /// Start a task to detect if this instance was orphaned (created but never actually used)
     func startOrphanDetection() {
-        // Cancel any existing timer
+        // Cancel any existing task
         cancelOrphanDetection()
         
-        FileLogger.shared.info("ScreenSaver[\(instanceID)]: Starting orphan detection timer (2 seconds)")
+        FileLogger.shared.info("ScreenSaver[\(instanceID)]: Starting orphan detection (2 seconds)")
         
-        // Create a timer that fires after 2 seconds
-        orphanDetectionTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+        orphanDetectionTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(2))
             guard let self = self else { return }
             
             // If we get here and haven't received any animateOneFrame calls, we're orphaned
@@ -37,11 +37,9 @@ extension MysteryPrismScreenSaver {
         }
     }
     
-    /// Cancel the orphan detection timer
+    /// Cancel the orphan detection task
     func cancelOrphanDetection() {
-        if let timer = orphanDetectionTimer {
-            timer.invalidate()
-            orphanDetectionTimer = nil
-        }
+        orphanDetectionTask?.cancel()
+        orphanDetectionTask = nil
     }
 }

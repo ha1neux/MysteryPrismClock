@@ -6,16 +6,16 @@
 //
 
 import SwiftUI
-import Combine
 
-class ClockViewModel: ObservableObject {
-    @Published var currentTime = Date()
-    @Published var clockPosition = CGPoint.zero
-    @Published var clockBaseColor = Color.random
-    @Published var screenSize = CGSize.zero
-    @Published var velocity = CGPoint(x: 1.0, y: 0.5)
-    @Published var debugInfo: String = "Debug mode active - waiting for data..."
-    @Published var showDebugInfo = false
+@Observable
+class ClockViewModel {
+    var currentTime = Date()
+    var clockPosition = CGPoint.zero
+    var clockBaseColor = Color.random
+    var screenSize = CGSize.zero
+    var velocity = CGPoint(x: 1.0, y: 0.5)
+    var debugInfo: String = "Debug mode active - waiting for data..."
+    var showDebugInfo = false
     
     private var lastDirectionChange: Date = .now
     private var lastColorChange: Date = .now

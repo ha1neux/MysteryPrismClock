@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MysteryPrismClockView: View {
-    @StateObject private var viewModel = ClockViewModel()
+    @State private var viewModel = ClockViewModel()
     @State private var opacity: CGFloat = 0.0
     @State private var hasInitialized = false
     

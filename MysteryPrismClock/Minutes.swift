@@ -76,19 +76,4 @@ func minutePath(
     }
 }
 
-func MinuteHand(
-    timeComponents: (seconds: Double, minutes: Double, hours: Double),
-    clockSize: CGFloat,
-    inset: CGFloat,
-    colors: ClockColors
-) -> some View {
-    MinuteHandView(
-        timeComponents: timeComponents,
-        clockSize: clockSize,
-        inset: inset,
-        insideColor: colors.mColor,
-        outsideColor: colors.mPrimeColor,
-        borderColor: colors.mBorderColor
-    )
-}
 

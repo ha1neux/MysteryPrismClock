@@ -69,32 +69,38 @@ struct ClockView: View {
                 )
                 
                 // Clock hands
-                MinuteHand(
+                MinuteHandView(
                     timeComponents: tc,
                     clockSize: clockSize,
                     inset: inset,
-                    colors: c
+                    insideColor: c.mColor,
+                    outsideColor: c.mPrimeColor,
+                    borderColor: c.mBorderColor
                 )
                 
-                HourHand(
+                HourHandView(
                     timeComponents: tc,
                     clockSize: clockSize,
                     inset: inset,
-                    colors: c
+                    insideColor: c.hColor,
+                    outsideColor: c.hPrimeColor,
+                    borderColor: c.hBorderColor
                 )
                 
-                MinuteHourOverlap(
+                MinuteHourOverlapView(
                     timeComponents: tc,
                     clockSize: clockSize,
                     inset: inset,
-                    colors: c
+                    overlapColor: c.hmColor,
+                    borderColor: c.hmBorderColor
                 )
                 
-                MinuteHourSecondsOverlap(
+                MinuteHourSecondsOverlapView(
                     timeComponents: tc,
                     clockSize: clockSize,
                     inset: inset,
-                    colors: c
+                    overlapColor: c.hmPrimeColor,
+                    borderColor: c.hmPrimeBorderColor
                 )
             }
             .opacity(opacity)
