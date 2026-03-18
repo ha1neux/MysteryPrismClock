@@ -32,7 +32,6 @@ struct MinuteHourSecondsOverlapView: View {
             inset: inset
         )
         
-        // Create three-way intersection using multiple masks
         ZStack {
             // Pinstripe border
             minuteHandPath
@@ -40,15 +39,10 @@ struct MinuteHourSecondsOverlapView: View {
                 .mask(hourHandPath)
                 .mask(secondsHandPath)
             
-            // Start with minute hand as base (invisible)
-            minuteHandPath
-                .fill(overlapColor.opacity(0.0))
-            
-            // Hour hand masked by minute hand
             hourHandPath
                 .fill(overlapColor)
                 .mask(minuteHandPath)
-                .mask(secondsHandPath) // Additionally mask by seconds path for triple intersection
+                .mask(secondsHandPath)
         }
         .frame(width: clockSize, height: clockSize)
     }

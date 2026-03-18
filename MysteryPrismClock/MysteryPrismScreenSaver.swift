@@ -300,7 +300,5 @@ class MysteryPrismScreenSaver: ScreenSaverView {
             performCleanup(reason: "deinit")
         }
         
-        // Note: SharedTimerManager and hostingView cleanup is handled by performCleanup.
-        // Accessing @MainActor-isolated members directly in deinit is not allowed.
     }
 }

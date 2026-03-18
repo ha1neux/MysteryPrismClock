@@ -199,4 +199,79 @@ struct ClockColorsTests {
         // Should calculate without issues
         _ = ClockColors(baseColor: baseColor, timeComponents: timeComponents)
     }
+
+    // MARK: - Color Interpolation Tests
+
+    @Test func interpolatedAtZeroReturnsStart() {
+        let start = Color(hue: 0.2, saturation: 0.8, brightness: 0.9)
+        let end = Color(hue: 0.7, saturation: 0.4, brightness: 0.5)
+
+        let result = start.interpolated(to: end, progress: 0.0)
+        let hsb = result.hsb
+
+        #expect(abs(hsb.hue - 0.2) <= 0.01)
+        #expect(abs(hsb.saturation - 0.8) <= 0.01)
+        #expect(abs(hsb.brightness - 0.9) <= 0.01)
+    }
+
+    @Test func interpolatedAtOneReturnsEnd() {
+        let start = Color(hue: 0.2, saturation: 0.8, brightness: 0.9)
+        let end = Color(hue: 0.7, saturation: 0.4, brightness: 0.5)
+
+        let result = start.interpolated(to: end, progress: 1.0)
+        let hsb = result.hsb
+
+        #expect(abs(hsb.hue - 0.7) <= 0.01)
+        #expect(abs(hsb.saturation - 0.4) <= 0.01)
+        #expect(abs(hsb.brightness - 0.5) <= 0.01)
+    }
+
+    @Test func interpolatedMidpoint() {
+        let start = Color(hue: 0.2, saturation: 0.6, brightness: 0.8)
+        let end = Color(hue: 0.4, saturation: 1.0, brightness: 0.4)
+
+        let result = start.interpolated(to: end, progress: 0.5)
+        let hsb = result.hsb
+
+        #expect(abs(hsb.hue - 0.3) <= 0.01)
+        #expect(abs(hsb.saturation - 0.8) <= 0.01)
+        #expect(abs(hsb.brightness - 0.6) <= 0.01)
+    }
+
+    @Test func interpolatedShortestPathWrap() {
+        // From 0.9 to 0.1 — direct distance is 0.8, but wrapping through 0.0 is only 0.2
+        // Midpoint should be at 0.0 (wrapping through red)
+        let start = Color(hue: 0.9, saturation: 1.0, brightness: 1.0)
+        let end = Color(hue: 0.1, saturation: 1.0, brightness: 1.0)
+
+        let result = start.interpolated(to: end, progress: 0.5)
+        let hsb = result.hsb
+
+        // Midpoint of 0.9 -> 0.1 via short path is 0.0 (or 1.0)
+        #expect(hsb.hue < 0.01 || hsb.hue > 0.99,
+                "Hue should wrap through 0.0, got \(hsb.hue)")
+    }
+
+    @Test func interpolatedShortestPathWrapReverse() {
+        // From 0.1 to 0.9 — should also wrap through 0.0, not go the long way
+        let start = Color(hue: 0.1, saturation: 1.0, brightness: 1.0)
+        let end = Color(hue: 0.9, saturation: 1.0, brightness: 1.0)
+
+        let result = start.interpolated(to: end, progress: 0.5)
+        let hsb = result.hsb
+
+        #expect(hsb.hue < 0.01 || hsb.hue > 0.99,
+                "Hue should wrap through 0.0, got \(hsb.hue)")
+    }
+
+    @Test func interpolatedSameColor() {
+        let color = Color(hue: 0.5, saturation: 0.7, brightness: 0.8)
+
+        let result = color.interpolated(to: color, progress: 0.5)
+        let hsb = result.hsb
+
+        #expect(abs(hsb.hue - 0.5) <= 0.01)
+        #expect(abs(hsb.saturation - 0.7) <= 0.01)
+        #expect(abs(hsb.brightness - 0.8) <= 0.01)
+    }
 }

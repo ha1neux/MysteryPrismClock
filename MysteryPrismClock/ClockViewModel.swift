@@ -50,7 +50,7 @@ class ClockViewModel {
         FileLogger.shared.info("ClockViewModel[\(ObjectIdentifier(self).hashValue)]: Ready to accept updates from animateOneFrame")
     }
     
-    // Called from the screensaver's animateOneFrame() method
+    // Called from the screensaver's animateOneFrame() method via SharedTimeManager
     func performSingleUpdate() {
         guard isRunning else { 
             // Not running anymore - clear ourselves from SharedTimerManager if we're still there
@@ -120,8 +120,7 @@ class ClockViewModel {
                 let elapsed = now.timeIntervalSince(startTime)
                 let progress = min(elapsed / colorTransitionDuration, 1.0)
                 
-                clockBaseColor = interpolateColor(
-                    from: oldClockBaseColor,
+                clockBaseColor = oldClockBaseColor.interpolated(
                     to: targetClockBaseColor,
                     progress: progress
                 )
@@ -145,7 +144,6 @@ class ClockViewModel {
     func stopUpdating() {
         let objectID = ObjectIdentifier(self).hashValue
         FileLogger.shared.logSeparator("STOP UPDATING")
-        FileLogger.shared.info("ClockViewModel[\(objectID)]: stopUpdating called - will stop accepting animateOneFrame updates")
         isRunning = false
         
         // Stop any ongoing color transition
@@ -238,70 +236,6 @@ class ClockViewModel {
         
         isTransitioningColor = true
         colorTransitionStartTime = .now
-    }
-    
-    /// Smoothly interpolates between two colors in HSB color space
-    ///
-    /// This function performs linear interpolation (lerp) for saturation and brightness,
-    /// but uses special logic for hue to ensure the shortest path around the color wheel.
-    ///
-    /// Color Wheel Wrapping Logic:
-    /// The hue component represents a circular color wheel (0.0 to 1.0, wrapping around).
-    /// When transitioning from one hue to another, there are two possible paths:
-    /// - Clockwise path
-    /// - Counter-clockwise path
-    ///
-    /// This function chooses the shorter path to create more natural color transitions.
-    ///
-    /// Example:
-    /// - From hue 0.1 (red) to 0.9 (purple):
-    ///   - Direct path: 0.1 -> 0.9 (distance = 0.8, goes through green/blue)
-    ///   - Wrapped path: 0.1 -> 0.0 -> 1.0 -> 0.9 (distance = 0.2, stays in red/purple range)
-    ///   - We choose the wrapped path (shorter)
-    ///
-    /// - Parameters:
-    ///   - startColor: The initial color
-    ///   - endColor: The target color
-    ///   - progress: Interpolation progress from 0.0 (startColor) to 1.0 (endColor)
-    /// - Returns: Interpolated color at the given progress
-    private func interpolateColor(from startColor: Color, to endColor: Color, progress: Double) -> Color {
-        let startHSB = startColor.hsb
-        let endHSB = endColor.hsb
-
-        // HUE INTERPOLATION with shortest path wrapping
-        // Calculate the hue difference (range: -1.0 to 1.0)
-        var hueDiff = endHSB.hue - startHSB.hue
-
-        // Adjust for shortest path around the color wheel
-        // If difference > 0.5 (more than halfway), wrap backwards (counter-clockwise)
-        // Example: 0.9 - 0.1 = 0.8 -> adjust to 0.8 - 1.0 = -0.2 (go backwards instead)
-        if hueDiff > 0.5 {
-            hueDiff -= 1.0
-        }
-        // If difference < -0.5 (more than halfway backwards), wrap forwards (clockwise)
-        // Example: 0.1 - 0.9 = -0.8 -> adjust to -0.8 + 1.0 = 0.2 (go forwards instead)
-        else if hueDiff < -0.5 {
-            hueDiff += 1.0
-        }
-
-        // Linear interpolation: start + (difference × progress)
-        // Example: start=0.1, diff=-0.2, progress=0.5 -> 0.1 + (-0.1) = 0.0
-        var interpolatedHue = startHSB.hue + (hueDiff * progress)
-
-        // Normalize hue to [0.0, 1.0] range
-        if interpolatedHue < 0.0 { interpolatedHue += 1.0 }
-        if interpolatedHue > 1.0 { interpolatedHue -= 1.0 }
-
-        // SATURATION AND BRIGHTNESS: Simple linear interpolation
-        // Formula: start + (end - start) × progress
-        let interpolatedSaturation = startHSB.saturation + (endHSB.saturation - startHSB.saturation) * progress
-        let interpolatedBrightness = startHSB.brightness + (endHSB.brightness - startHSB.brightness) * progress
-
-        return Color(
-            hue: interpolatedHue,
-            saturation: interpolatedSaturation,
-            brightness: interpolatedBrightness
-        )
     }
     
     private func updateDebugInfo() {

@@ -27,20 +27,15 @@ struct MinuteHourOverlapView: View {
             inset: inset
         )
         
-        // Create intersection using blend mode
         ZStack {
             // Pinstripe border
             minuteHandPath
                 .stroke(borderColor, lineWidth: 1)
                 .mask(hourHandPath)
             
-            minuteHandPath
-                .fill(overlapColor.opacity(0.0)) // Invisible base
-            
             hourHandPath
                 .fill(overlapColor)
-                .blendMode(.sourceAtop) // Only show where it overlaps with minute path
-                .mask(minuteHandPath) // Mask with minute hand shape
+                .mask(minuteHandPath)
         }
         .frame(width: clockSize, height: clockSize)
     }

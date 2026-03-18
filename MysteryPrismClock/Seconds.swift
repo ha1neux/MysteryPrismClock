@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SecondsDisk: View {
+struct SecondsDiskView: View {
     let timeSeconds: Double
     let clockSize: Double
     let inset: Double
