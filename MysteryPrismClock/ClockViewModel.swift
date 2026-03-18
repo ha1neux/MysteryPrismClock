@@ -7,9 +7,10 @@
 
 import SwiftUI
 
+@MainActor
 @Observable
 class ClockViewModel {
-    var currentTime = Date()
+    var currentTime = Date.now
     var clockPosition = CGPoint.zero
     var clockBaseColor = Color.random
     var screenSize = CGSize.zero
@@ -33,9 +34,9 @@ class ClockViewModel {
     var updateCount: Int = 0
 
     // Base constants
-    private let baseSpeed: CGFloat = 0.16
-    private let inset: CGFloat = 0.8
-    private let clockSizeFactor: CGFloat = 2.0
+    private let baseSpeed: Double = 0.16
+    private let inset: Double = 0.8
+    private let clockSizeFactor: Double = 2.0
     private var directionChangeInterval: TimeInterval = 15.0
     private var colorChangeInterval: TimeInterval = 30.0
     private var colorTransitionDuration: TimeInterval = 2.0
@@ -62,7 +63,7 @@ class ClockViewModel {
         
         updateCount += 1
         frameCount += 1
-        let now = Date()
+        let now = Date.now
         
         let objectID = ObjectIdentifier(self).hashValue
         
@@ -91,7 +92,7 @@ class ClockViewModel {
         // Update caps lock state
         updateCapsLockState()
         
-        // Direction change (every 15 seconds)
+        // Direction change (appx 15 seconds)
         if now.timeIntervalSince(lastDirectionChange) >= directionChangeInterval {
             changeDirection()
             lastDirectionChange = now
@@ -102,7 +103,7 @@ class ClockViewModel {
             }
         }
         
-        // Color change (every 30 seconds) - start transition
+        // Color change (appx 30 seconds) - start transition
         if now.timeIntervalSince(lastColorChange) >= colorChangeInterval {
             startColorTransition()
             lastColorChange = now
@@ -133,7 +134,7 @@ class ClockViewModel {
             }
         }
         
-        // Debug info (every second, ~60 frames)
+        // Debug info (every second or 60 frames)
         if frameCount % 60 == 0 || now.timeIntervalSince(lastDebugUpdate) >= 1.0 {
             updateDebugInfo()
             lastDebugUpdate = now
@@ -171,7 +172,7 @@ class ClockViewModel {
         )
     }
     
-    private func calculateClockSize(for size: CGSize) -> CGFloat {
+    private func calculateClockSize(for size: CGSize) -> Double {
         let baseDimension = min(size.width, size.height)
         return baseDimension / clockSizeFactor
     }
@@ -190,14 +191,14 @@ class ClockViewModel {
         if newPosition.x <= margin || newPosition.x >= screenSize.width - margin {
             velocity.x = -velocity.x
             newPosition.x = clockPosition.x + velocity.x
-            velocity.y += CGFloat.random(in: -0.2...0.2)
+            velocity.y += Double.random(in: -0.2...0.2)
             velocity.y = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.y))
         }
         
         if newPosition.y <= margin || newPosition.y >= screenSize.height - margin {
             velocity.y = -velocity.y
             newPosition.y = clockPosition.y + velocity.y
-            velocity.x += CGFloat.random(in: -0.2...0.2)
+            velocity.x += Double.random(in: -0.2...0.2)
             velocity.x = max(-baseSpeed * 2, min(baseSpeed * 2, velocity.x))
         }
         
@@ -213,13 +214,13 @@ class ClockViewModel {
         let newAngle = currentAngle + angleChange
 
         // 15% chance for fast velocity, 85% for normal velocity
-        let speedMultiplier: CGFloat
+        let speedMultiplier: Double
         if Double.random(in: 0.0...10.0) < 1.5 {
             // Fast velocity (15% of the time)
-            speedMultiplier = CGFloat.random(in: 3.0...5.0)
+            speedMultiplier = Double.random(in: 3.0...5.0)
         } else {
             // Normal velocity (85% of the time)
-            speedMultiplier = CGFloat.random(in: 0.5...1.5)
+            speedMultiplier = Double.random(in: 0.5...1.5)
         }
         let newSpeed = baseSpeed * speedMultiplier
 
@@ -236,7 +237,7 @@ class ClockViewModel {
         targetClockBaseColor = Color.random
         
         isTransitioningColor = true
-        colorTransitionStartTime = Date()
+        colorTransitionStartTime = .now
     }
     
     /// Smoothly interpolates between two colors in HSB color space
@@ -356,13 +357,4 @@ class ClockViewModel {
         showDebugInfo = NSEvent.modifierFlags.contains(.capsLock)
     }
     
-    deinit {
-        let objectID = ObjectIdentifier(self).hashValue
-        FileLogger.shared.logLifecycle(
-            object: "ClockViewModel[\(objectID)]",
-            event: "deinit",
-            details: "finalUpdateCount=\(updateCount), isRunning=\(isRunning)"
-        )
-        stopUpdating()
-    }
 }

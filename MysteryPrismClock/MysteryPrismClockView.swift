@@ -9,18 +9,18 @@ import SwiftUI
 
 struct MysteryPrismClockView: View {
     @State private var viewModel = ClockViewModel()
-    @State private var opacity: CGFloat = 0.0
+    @State private var opacity: Double = 0.0
     @State private var hasInitialized = false
     
     // Constants
-    private let clockSizeFactor: CGFloat = 2.0
-    private let inset: CGFloat = 0.8
-    private var insetPrime: CGFloat { (1.0 - inset) / 2 }
+    private let clockSizeFactor: Double = 2.0
+    private let inset: Double = 0.8
+    private var insetPrime: Double { (1.0 - inset) / 2 }
 
     // Movement constants
     private let fadeInDuration: TimeInterval = 5.0
     
-    private var clockSize: CGFloat {
+    private var clockSize: Double {
         let baseDimension = min(viewModel.screenSize.width, viewModel.screenSize.height)
         return baseDimension / clockSizeFactor
     }

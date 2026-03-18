@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SecondsDisk: View {
     let timeSeconds: Double
-    let clockSize: CGFloat
-    let inset: CGFloat
+    let clockSize: Double
+    let inset: Double
     let color: Color
     let borderColor: Color
     
@@ -40,8 +40,8 @@ struct SecondsDisk: View {
 
 func secondsPath(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
-    clockSize: CGFloat,
-    inset: CGFloat
+    clockSize: Double,
+    inset: Double
 ) -> Path {
     let radius = clockSize * inset / 3.0
     let angle = 2.0 * .pi * timeComponents.seconds / 60.0

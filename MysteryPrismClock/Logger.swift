@@ -31,7 +31,7 @@ public class FileLogger {
         guard !hasWrittenHeader, let fileURL = fileURL else { return }
         hasWrittenHeader = true
         
-        let header = "=== MysteryPrismClock Log ===\nStarted: \(Date())\n\n"
+        let header = "=== MysteryPrismClock Log ===\nStarted: \(Date.now)\n\n"
         do {
             try header.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {
@@ -48,7 +48,7 @@ public class FileLogger {
         // or if we don't have a file yet and logging is enabled
         if isLoggingEnabled && (!wasEnabled || fileURL == nil) {
             // Create a new log file for this session
-            let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+            let timestamp = ISO8601DateFormatter().string(from: .now).replacing(":", with: "-")
             let fileName = "MysteryPrismClock-\(timestamp).log"
             fileURL = URL(fileURLWithPath: "/tmp/\(fileName)")
             hasWrittenHeader = false
@@ -81,7 +81,7 @@ public class FileLogger {
         // Write header on first log message
         writeHeaderIfNeeded()
         
-        let timestamp = dateFormatter.string(from: Date())
+        let timestamp = dateFormatter.string(from: .now)
         let threadInfo = Thread.isMainThread ? "main" : "bg"
         let logEntry = "[\(timestamp)] [\(threadInfo)] [\(level.rawValue)] \(message)\n"
         

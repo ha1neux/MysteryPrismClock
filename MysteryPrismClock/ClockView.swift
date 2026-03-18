@@ -12,10 +12,10 @@ import SwiftUI
 struct ClockView: View {
     let time: Date
     let clockBaseColor: Color
-    let clockSize: CGFloat
-    let inset: CGFloat
-    let insetPrime: CGFloat
-    var opacity: CGFloat = 1.0  // Add opacity parameter with default value
+    let clockSize: Double
+    let inset: Double
+    let insetPrime: Double
+    var opacity: Double = 1.0  // Add opacity parameter with default value
     
     private var timeComponents: (seconds: Double, minutes: Double, hours: Double) {
         let calendar = Calendar.current

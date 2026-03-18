@@ -8,6 +8,7 @@
 import Foundation
 
 // Shared timer manager that can be accessed from the screensaver wrapper
+@MainActor
 public class SharedTimerManager {
     public static let shared = SharedTimerManager()
     

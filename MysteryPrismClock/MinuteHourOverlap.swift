@@ -9,8 +9,8 @@ import SwiftUI
 
 struct MinuteHourOverlapView: View {
     let timeComponents: (seconds: Double, minutes: Double, hours: Double)
-    let clockSize: CGFloat
-    let inset: CGFloat
+    let clockSize: Double
+    let inset: Double
     let overlapColor: Color
     let borderColor: Color
     

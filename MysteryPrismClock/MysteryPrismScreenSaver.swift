@@ -208,8 +208,8 @@ class MysteryPrismScreenSaver: ScreenSaverView {
                 isStopped = true
                 performCleanup(reason: "viewDidMoveToWindow-nil")
             }
-        } else {
-            FileLogger.shared.info("ScreenSaver[\(instanceID)]: viewDidMoveToWindow called with window: \(window!)")
+        } else if let window {
+            FileLogger.shared.info("ScreenSaver[\(instanceID)]: viewDidMoveToWindow called with window: \(window)")
         }
     }
     
@@ -300,9 +300,7 @@ class MysteryPrismScreenSaver: ScreenSaverView {
             performCleanup(reason: "deinit")
         }
         
-        SharedTimerManager.shared.currentViewModel?.stopUpdating()
-        SharedTimerManager.shared.currentViewModel = nil
-        hostingView?.removeFromSuperview()
-        hostingView = nil
+        // Note: SharedTimerManager and hostingView cleanup is handled by performCleanup.
+        // Accessing @MainActor-isolated members directly in deinit is not allowed.
     }
 }

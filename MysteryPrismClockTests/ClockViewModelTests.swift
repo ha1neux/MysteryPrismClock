@@ -146,7 +146,7 @@ struct ClockViewModelTests {
             viewModel.performSingleUpdate()
         }
 
-        let maxSpeed: CGFloat = 0.16 * 2
+        let maxSpeed: Double = 0.16 * 2
         #expect(abs(viewModel.velocity.x) < maxSpeed * 1.5, "X velocity should be bounded")
         #expect(abs(viewModel.velocity.y) < maxSpeed * 1.5, "Y velocity should be bounded")
     }

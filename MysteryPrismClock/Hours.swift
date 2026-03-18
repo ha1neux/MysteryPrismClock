@@ -9,8 +9,8 @@ import SwiftUI
 
 struct HourHandView: View {
     let timeComponents: (seconds: Double, minutes: Double, hours: Double)
-    let clockSize: CGFloat
-    let inset: CGFloat
+    let clockSize: Double
+    let inset: Double
     let insideColor: Color
     let outsideColor: Color
     let borderColor: Color
@@ -45,8 +45,8 @@ struct HourHandView: View {
 
 func hourPath(
     timeComponents: (seconds: Double, minutes: Double, hours: Double),
-    clockSize: CGFloat,
-    inset: CGFloat
+    clockSize: Double,
+    inset: Double
 ) -> Path {
     let angle = (.pi / 6.0) * timeComponents.hours
     let center = CGPoint(x: clockSize / 2, y: clockSize / 2)
