@@ -5,7 +5,7 @@
 //  Created by Bill Coderre on 11/4/25.
 //
 
-// This does all the work of drawing the clock.
+// This does the work of drawing the clock.
 
 import SwiftUI
 
@@ -15,7 +15,7 @@ struct ClockView: View {
     let clockSize: Double
     let inset: Double
     let insetPrime: Double
-    var opacity: Double = 1.0  // Add opacity parameter with default value
+    var opacity: Double = 1.0
     
     private var timeComponents: (seconds: Double, minutes: Double, hours: Double) {
         let calendar = Calendar.current
@@ -59,8 +59,7 @@ struct ClockView: View {
                     .stroke(c.sPrimeBorderColor, lineWidth: 1)
                     .frame(width: clockSize * inset, height: clockSize * inset)
                 
-                // Seconds disk
-                SecondsDisk(
+                SecondsDiskView(
                     timeSeconds: tc.seconds,
                     clockSize: clockSize,
                     inset: inset,
@@ -68,7 +67,6 @@ struct ClockView: View {
                     borderColor: c.sBorderColor
                 )
                 
-                // Clock hands
                 MinuteHandView(
                     timeComponents: tc,
                     clockSize: clockSize,
